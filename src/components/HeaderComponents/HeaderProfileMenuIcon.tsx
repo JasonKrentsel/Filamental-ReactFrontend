@@ -81,10 +81,13 @@ const HeaderProfileMenuIcon = () => {
                   onKeyDown={handleListKeyDown}
                 >
                   <MenuItem disabled onClick={handleClose}>
-                    Profile
+                    My Account
                   </MenuItem>
                   <MenuItem disabled onClick={handleClose}>
-                    My account
+                    My Organization
+                  </MenuItem>
+                  <MenuItem disabled onClick={handleClose}>
+                    Billing
                   </MenuItem>
                   <MenuItem
                     onClick={(e) => {

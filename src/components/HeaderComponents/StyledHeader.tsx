@@ -1,5 +1,6 @@
 import { useContext } from "react";
-import { AppBar, Box, Button, Typography } from "@mui/material";
+import { AppBar, Box, Button, Tooltip, Typography } from "@mui/material";
+import LogoDevIcon from "@mui/icons-material/LogoDev";
 
 import HeaderProfileMenuIcon from "./HeaderProfileMenuIcon";
 import LoginButton from "./LoginButton";
@@ -18,10 +19,20 @@ const StyledHeader = () => {
         alignItems="center"
         width="100%"
       >
-        <Box padding={1}>
-          {/* Left-aligned content */}
-          <Typography variant="h6">Filamental</Typography>
-        </Box>
+        <Tooltip arrow title="Return to Homepage">
+          <Box
+            onClick={() => navigate("/")}
+            sx={{ cursor: "pointer" }}
+            padding={1}
+            display="flex"
+            alignItems="center"
+            gap={1}
+          >
+            {/* Left-aligned content */}
+            <LogoDevIcon fontSize="large" />
+            <Typography variant="h6">Filamental</Typography>
+          </Box>
+        </Tooltip>
 
         <Box>
           {/* Right-aligned content */}
