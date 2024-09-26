@@ -1,7 +1,9 @@
 const HomePage = () => {
   return (
     <div>
-      <h1>Filamental Homepage</h1>
+      {[...Array(100)].map((_, index) => (
+        <h1 key={index}>Filamental Homepage</h1>
+      ))}
     </div>
   );
 };

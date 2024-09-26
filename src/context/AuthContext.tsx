@@ -1,11 +1,8 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
-import {
-  getToken,
-  getRefreshToken,
-  AuthResponse,
-} from "../utils/ApiHandlers/AuthHandler.ts";
+import { getRefreshToken, getToken } from "../utils/ApiHandlers/AuthHandler.ts";
+
 // ------------------- Interfaces -------------------
 // UPDATE INTERFACE WHEN UPDATING BACKEND AUTH TOKEN RESPONSE
 export interface DecodedAuthToken {
@@ -21,35 +18,6 @@ export interface DecodedAuthToken {
   organization_name: string;
   is_org_master: boolean;
 }
-
-// ------------------- Utility Functions -------------------
-
-const isTokenExpired = (token: string): boolean => {
-  if (token) {
-    const decodedToken: DecodedAuthToken = jwtDecode<DecodedAuthToken>(token);
-    const currentTime = Math.floor(Date.now() / 1000);
-    return decodedToken.exp < currentTime;
-  }
-  return true;
-};
-
-const refreshAccessTokenIfExpired = (
-  accessToken: string,
-  refreshToken: string
-): Promise<AuthResponse> => {
-  // if refresh token is expired, return error
-  if (isTokenExpired(refreshToken)) {
-    return Promise.reject(new Error("Refresh token is expired"));
-  }
-
-  if (isTokenExpired(accessToken)) {
-    // if access token is expired, but refresh token is not, refresh auth tokens
-    return getRefreshToken(refreshToken);
-  } else {
-    // else, return the previous access and refresh tokens
-    return Promise.resolve({ access: accessToken, refresh: refreshToken });
-  }
-};
 
 // ------------------- Context -------------------
 
@@ -78,35 +46,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   // load tokens from local storage, if they exist
   const [accessToken, setAccessToken] = useState<string>(
-    localStorage.getItem("accessToken") || ""
+    () => localStorage.getItem("accessToken") || ""
   );
   const [refreshToken, setRefreshToken] = useState<string>(
-    localStorage.getItem("refreshToken") || ""
+    () => localStorage.getItem("refreshToken") || ""
   );
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // create user state
   const [user, setUser] = useState<DecodedAuthToken | null>(null);
-
-  // this useEffect checks over the Auth tokens
-  // refreshAccessTokenIfExpired() is given the access and refresh tokens
-  // if both tokens are valid, it "data" returns the previous access and refresh tokens
-  // if the access token is expired, but the refresh token is not, it will be refreshed
-  // if the access token is expired and the refresh token is expired, we will catch the error and set the user to logged out
-  useEffect(() => {
-    refreshAccessTokenIfExpired(accessToken, refreshToken)
-      .then((data) => {
-        setAccessToken(data.access);
-        setRefreshToken(data.refresh);
-        setUser(jwtDecode<DecodedAuthToken>(data.access));
-        localStorage.setItem("accessToken", data.access);
-        localStorage.setItem("refreshToken", data.refresh);
-      })
-      .catch(() => {
-        // refresh token is expired
-        // set to logged out state
-        logout();
-      });
-  }, [user, accessToken, refreshToken]);
 
   /**
    * Handles user login.
@@ -146,13 +94,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   // context value, which is passed to the AuthContext.Provider
-  const contextValue = {
+  const contextValue: AuthContextType = {
     user,
     accessToken,
     refreshToken,
     login,
     logout,
   };
+
+  useEffect(() => {
+    const updateAuthTokens = async () => {
+      console.log("Updating auth tokens");
+      try {
+        const { access, refresh } = await getRefreshToken(refreshToken);
+        setAccessToken(access);
+        setRefreshToken(refresh);
+        setUser(jwtDecode<DecodedAuthToken>(access));
+        localStorage.setItem("accessToken", access);
+        localStorage.setItem("refreshToken", refresh);
+      } catch (error) {
+        console.error(error);
+        logout();
+        alert("Your login has expired. Please login again.");
+      }
+    };
+
+    if (isLoading) {
+      updateAuthTokens();
+      setIsLoading(false);
+    }
+
+    // 4 minutes
+    const timeInterval = 1000 * 60 * 4;
+    const intervalId = setInterval(() => {
+      if (accessToken && refreshToken) {
+        updateAuthTokens();
+      }
+    }, timeInterval);
+    return () => clearInterval(intervalId);
+  }, [isLoading, accessToken, refreshToken]);
 
   // return the AuthContext.Provider with the context value
   return (
