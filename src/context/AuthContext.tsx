@@ -16,7 +16,7 @@ export interface DecodedAuthToken {
   username: string;
   email: string;
   organization_name: string;
-  is_org_master: boolean;
+  role: string;
 }
 
 // ------------------- Context -------------------
