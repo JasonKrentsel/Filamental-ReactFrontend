@@ -4,12 +4,11 @@ import { AppBar, Box, Button, Typography } from "@mui/material";
 import HeaderProfileMenuIcon from "./HeaderProfileMenuIcon";
 import LoginButton from "./LoginButton";
 import AuthContext from "../../context/AuthContext";
-//import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const StyledHeader = () => {
   const { user } = useContext(AuthContext);
-  //const navigate = useNavigate();
-  //const location = useLocation();
+  const navigate = useNavigate();
 
   return (
     <AppBar position="sticky">
@@ -28,7 +27,11 @@ const StyledHeader = () => {
           {/* Right-aligned content */}
           {user ? (
             <>
-              <Button variant="contained" color="inherit">
+              <Button
+                variant="contained"
+                color="inherit"
+                onClick={() => navigate("/dashboard")}
+              >
                 Dashboard
               </Button>
               <HeaderProfileMenuIcon />

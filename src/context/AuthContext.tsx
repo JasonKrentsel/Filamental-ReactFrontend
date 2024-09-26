@@ -115,12 +115,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       } catch (error) {
         console.error(error);
         logout();
-        alert("Your login has expired. Please login again.");
       }
     };
 
     if (isLoading) {
-      updateAuthTokens();
+      if (accessToken && refreshToken) {
+        updateAuthTokens();
+      }
       setIsLoading(false);
     }
 

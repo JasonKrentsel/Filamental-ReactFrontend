@@ -3,7 +3,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
-import PrivatePage from "./pages/PrivatePage";
+import UserDashboard from "./pages/UserDashboard";
 
 import PrivateRoute from "./utils/PrivateRoute";
 import StyledHeader from "./components/HeaderComponents/StyledHeader";
@@ -22,10 +22,10 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route
-                path="/private"
+                path="/dashboard"
                 element={
                   <PrivateRoute>
-                    <PrivatePage />
+                    <UserDashboard />
                   </PrivateRoute>
                 }
               />
