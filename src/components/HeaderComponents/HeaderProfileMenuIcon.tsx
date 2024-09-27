@@ -40,13 +40,14 @@ const HeaderProfileMenuIcon = () => {
     }
   }
 
+  // TODO: Implement MUI avatar over the account circle icon
   return (
     <>
       {/* Profile menu icon with dropdown */}
       <IconButton
         ref={anchorRef}
-        id="composition-button"
-        aria-controls={open ? "composition-menu" : undefined}
+        id="profile-button"
+        aria-controls={open ? "profile-menu" : undefined}
         aria-expanded={open ? "true" : undefined}
         aria-haspopup="true"
         onClick={handleToggle}
