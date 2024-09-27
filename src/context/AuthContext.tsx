@@ -54,7 +54,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // create user state
-  const [user, setUser] = useState<DecodedAuthToken | null>(null);
+  const [user, setUser] = useState<DecodedAuthToken | null>(() =>
+    accessToken ? jwtDecode<DecodedAuthToken>(accessToken) : null
+  );
 
   /**
    * Handles user login.
