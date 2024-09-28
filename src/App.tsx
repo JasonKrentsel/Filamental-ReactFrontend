@@ -16,7 +16,14 @@ function App() {
     <div style={{ width: "100%", padding: "0px" }}>
       <AuthProvider>
         <Router>
-          <Stack sx={{ width: "100%", padding: "0px" }}>
+          <Stack
+            sx={{
+              width: "100%",
+              padding: "0px",
+              height: "100vh",
+              overflow: "hidden",
+            }}
+          >
             <StyledHeader />
 
             <Routes>
