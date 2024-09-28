@@ -66,11 +66,11 @@ const DirectoryManagerCell = ({
       <Stack
         spacing={1}
         sx={{
-          height: "90%",
+          height: "100%",
           paddingRight: 2,
           paddingLeft: 2,
           paddingTop: 2,
-          paddingBottom: 6,
+          paddingBottom: 2,
         }}
       >
         {/* Breadcrumb */}
@@ -94,7 +94,7 @@ const DirectoryManagerCell = ({
             />
           ))}
         </Breadcrumbs>
-        <div style={{ height: "100%" }}>
+        <div style={{ height: "91%" }}>
           <DirectoryTable
             currentDirectory={currentDirectory}
             handleSelect={handleSelect}
