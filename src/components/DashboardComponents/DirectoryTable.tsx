@@ -37,9 +37,7 @@ const DirectoryTable = ({
   selectedItems,
 }: DirectoryTableProps) => {
   return (
-    <TableContainer
-      sx={{ borderRadius: "16px", overflow: "scroll", height: "100%" }}
-    >
+    <TableContainer sx={{ borderRadius: "16px", overflow: "scroll" }}>
       <Table stickyHeader sx={{ userSelect: "none" }}>
         {/* table header */}
         <TableHead>

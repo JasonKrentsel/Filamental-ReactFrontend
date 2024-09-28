@@ -1,17 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Directory } from "../../utils/FileStructure/Directory";
 import { exampleRoot } from "../../utils/FileStructure/Directory";
-import { Breadcrumbs, Chip, Paper, Stack, Typography } from "@mui/material";
+import { Breadcrumbs, Chip, Fab, Stack, Typography } from "@mui/material";
 import DirectoryTable from "./DirectoryTable";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import AddIcon from "@mui/icons-material/Add";
 
-interface DirectoryManagerCellProps {
-  borderRadius?: string;
-}
-
-const DirectoryManagerCell = ({
-  borderRadius = "16px",
-}: DirectoryManagerCellProps) => {
+const DirectoryManagerCell = () => {
   const [currentDirectory, setCurrentDirectory] =
     useState<Directory>(exampleRoot);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
@@ -62,48 +57,51 @@ const DirectoryManagerCell = ({
   }, []);
 
   return (
-    <Paper ref={tableRef} sx={{ borderRadius: borderRadius, height: "100%" }}>
-      <Stack
-        spacing={1}
-        sx={{
-          height: "100%",
-          paddingRight: 2,
-          paddingLeft: 2,
-          paddingTop: 2,
-          paddingBottom: 2,
-        }}
-      >
-        {/* Breadcrumb */}
-        <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-          {directoryStack.map((dir, index) => (
-            <Chip
-              key={dir.name}
-              label={
-                <Typography variant="h6" color="text.secondary">
-                  {dir.name}
-                </Typography>
-              }
-              sx={{
-                padding: 1,
-              }}
-              onClick={() => {
-                // remove all directories after the current index
-                setDirectoryStack(directoryStack.slice(0, index + 1));
-                setCurrentDirectory(directoryStack[index]);
-              }}
-            />
-          ))}
-        </Breadcrumbs>
-        <div style={{ height: "91%" }}>
-          <DirectoryTable
-            currentDirectory={currentDirectory}
-            handleSelect={handleSelect}
-            handleEnterDir={handleEnterDir}
-            selectedItems={selectedItems}
+    <Stack
+      ref={tableRef}
+      spacing={1}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        position: "relative",
+      }}
+    >
+      {/* Breadcrumb */}
+      <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+        {directoryStack.map((dir, index) => (
+          <Chip
+            key={dir.name}
+            label={
+              <Typography variant="h6" color="text.secondary">
+                {dir.name}
+              </Typography>
+            }
+            sx={{
+              padding: 1,
+            }}
+            onClick={() => {
+              // remove all directories after the current index
+              setDirectoryStack(directoryStack.slice(0, index + 1));
+              setCurrentDirectory(directoryStack[index]);
+            }}
           />
-        </div>
-      </Stack>
-    </Paper>
+        ))}
+      </Breadcrumbs>
+      <DirectoryTable
+        currentDirectory={currentDirectory}
+        handleSelect={handleSelect}
+        handleEnterDir={handleEnterDir}
+        selectedItems={selectedItems}
+      />
+      <Fab
+        color="primary"
+        aria-label="add"
+        sx={{ position: "absolute", bottom: 0, right: 0 }}
+      >
+        <AddIcon />
+      </Fab>
+    </Stack>
   );
 };
 
