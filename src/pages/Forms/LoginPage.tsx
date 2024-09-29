@@ -29,7 +29,7 @@ const LoginPage = () => {
         <form
           onSubmit={(e) => {
             login(e).then(() => {
-              navigate(state.from || "/");
+              navigate(state?.from || "/");
             });
           }}
         >

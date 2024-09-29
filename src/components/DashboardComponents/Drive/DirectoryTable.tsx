@@ -1,5 +1,6 @@
-import { Directory } from "../../utils/FileStructure/Directory";
+import { Directory } from "../../../utils/FileStructure/Directory";
 import {
+  Divider,
   Table,
   TableBody,
   TableCell,
@@ -37,7 +38,15 @@ const DirectoryTable = ({
   selectedItems,
 }: DirectoryTableProps) => {
   return (
-    <TableContainer sx={{ borderRadius: "16px", overflow: "scroll" }}>
+    <TableContainer
+      sx={{
+        borderRadius: "16px",
+        overflow: "scroll",
+        "&::-webkit-scrollbar": { display: "none" }, // Hide scrollbar for WebKit browsers
+        "-ms-overflow-style": "none", // Hide scrollbar for IE and Edge
+        "scrollbar-width": "none", // Hide scrollbar for Firefox
+      }}
+    >
       <Table stickyHeader sx={{ userSelect: "none" }}>
         {/* table header */}
         <TableHead>
@@ -136,6 +145,7 @@ const DirectoryTable = ({
           ))}
         </TableBody>
       </Table>
+      <Divider sx={{ width: "100%", borderBottomWidth: 2 }} />
     </TableContainer>
   );
 };

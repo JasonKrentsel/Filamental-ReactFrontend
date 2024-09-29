@@ -1,5 +1,5 @@
 import { Divider, Grid2, Paper, Stack, Typography } from "@mui/material";
-import DirectoryManagerCell from "../components/DashboardComponents/DirectoryManagerCell";
+import DirectoryManagerCell from "../components/DashboardComponents/Drive/DirectoryManagerCell";
 
 const GRID_HEIGHT = "100%";
 const BORDER_RADIUS = "16px";

@@ -1,8 +1,12 @@
 import { Button, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
+import { useContext } from "react";
+import AuthContext from "../context/AuthContext";
+
 const HomePage = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
   return (
     <>
       <div
@@ -18,27 +22,39 @@ const HomePage = () => {
         <p>Your smart drive service</p>
         <p>Homepage under construction</p>
 
-        <Stack direction="row" spacing={2}>
+        {user ? (
           <Button
             variant="contained"
             color="primary"
             onClick={() => {
-              navigate("/login");
+              navigate("/dashboard");
             }}
           >
-            Login
+            Dashboard
           </Button>
+        ) : (
+          <Stack direction="row" spacing={2}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                navigate("/login");
+              }}
+            >
+              Login
+            </Button>
 
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              navigate("/register");
-            }}
-          >
-            Register
-          </Button>
-        </Stack>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                navigate("/register");
+              }}
+            >
+              Register
+            </Button>
+          </Stack>
+        )}
       </div>
     </>
   );

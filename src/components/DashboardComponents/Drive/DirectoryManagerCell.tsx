@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { Directory } from "../../utils/FileStructure/Directory";
-import { exampleRoot } from "../../utils/FileStructure/Directory";
-import { Breadcrumbs, Chip, Fab, Stack, Typography } from "@mui/material";
+import { Directory } from "../../../utils/FileStructure/Directory";
+import { exampleRoot } from "../../../utils/FileStructure/Directory";
+import { Breadcrumbs, Chip, Stack, Typography } from "@mui/material";
 import DirectoryTable from "./DirectoryTable";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import AddIcon from "@mui/icons-material/Add";
+import AddActionFAB from "./AddActionFAB";
 
 const DirectoryManagerCell = () => {
   const [currentDirectory, setCurrentDirectory] =
@@ -16,10 +16,9 @@ const DirectoryManagerCell = () => {
   ]);
 
   const handleSelect = (name: string, event: React.MouseEvent) => {
-    event.stopPropagation(); // Prevent event from bubbling up to document
     setSelectedItems((prevSelected) => {
       const newSelected = new Set(prevSelected);
-      if (event.ctrlKey) {
+      if (event.ctrlKey || event.shiftKey) {
         // Ctrl-click: add/remove item from selection
         if (newSelected.has(name)) {
           newSelected.delete(name);
@@ -94,13 +93,7 @@ const DirectoryManagerCell = () => {
         handleEnterDir={handleEnterDir}
         selectedItems={selectedItems}
       />
-      <Fab
-        color="primary"
-        aria-label="add"
-        sx={{ position: "absolute", bottom: 0, right: 0 }}
-      >
-        <AddIcon />
-      </Fab>
+      <AddActionFAB />
     </Stack>
   );
 };
