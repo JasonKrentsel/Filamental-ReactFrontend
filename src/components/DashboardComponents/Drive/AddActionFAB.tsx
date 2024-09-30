@@ -14,7 +14,15 @@ import FolderIcon from "@mui/icons-material/Folder";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { useState } from "react";
 
-const AddActionFAB = () => {
+interface AddActionFABProps {
+  onUploadFileDialog: () => void;
+  onNewFolderDialog: () => void;
+}
+
+const AddActionFAB: React.FC<AddActionFABProps> = ({
+  onUploadFileDialog,
+  onNewFolderDialog,
+}) => {
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -61,17 +69,27 @@ const AddActionFAB = () => {
             <Paper sx={{ marginBottom: 1, padding: 0 }}>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList sx={{ margin: 0, padding: 0 }}>
-                  <MenuItem onClick={handleClose}>
+                  <MenuItem
+                    onClick={() => {
+                      onUploadFileDialog();
+                      handleClose();
+                    }}
+                  >
                     <Stack
                       gap={2}
                       direction="row"
                       justifyContent="space-between"
                       width="100%"
                     >
-                      <InsertDriveFileIcon /> Upload File
+                      <InsertDriveFileIcon /> Upload Files
                     </Stack>
                   </MenuItem>
-                  <MenuItem onClick={handleClose}>
+                  <MenuItem
+                    onClick={() => {
+                      onNewFolderDialog();
+                      handleClose();
+                    }}
+                  >
                     <Stack
                       gap={2}
                       direction="row"

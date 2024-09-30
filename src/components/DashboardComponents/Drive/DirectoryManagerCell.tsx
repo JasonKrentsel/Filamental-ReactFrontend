@@ -5,6 +5,8 @@ import { Breadcrumbs, Chip, Stack, Typography } from "@mui/material";
 import DirectoryTable from "./DirectoryTable";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import AddActionFAB from "./AddActionFAB";
+import UploadFileDialog from "./Dialogs/UploadFileDialog";
+import NewFolderDialog from "./Dialogs/NewFolderDialog";
 
 const DirectoryManagerCell = () => {
   const [currentDirectory, setCurrentDirectory] =
@@ -14,6 +16,9 @@ const DirectoryManagerCell = () => {
   const [directoryStack, setDirectoryStack] = useState<Directory[]>([
     currentDirectory,
   ]);
+
+  const [openUploadFileDialog, setOpenUploadFileDialog] = useState(false);
+  const [openNewFolderDialog, setOpenNewFolderDialog] = useState(false);
 
   const handleSelect = (name: string, event: React.MouseEvent) => {
     setSelectedItems((prevSelected) => {
@@ -93,7 +98,26 @@ const DirectoryManagerCell = () => {
         handleEnterDir={handleEnterDir}
         selectedItems={selectedItems}
       />
-      <AddActionFAB />
+      <AddActionFAB
+        onUploadFileDialog={() => setOpenUploadFileDialog(true)}
+        onNewFolderDialog={() => setOpenNewFolderDialog(true)}
+      />
+      <UploadFileDialog
+        isOpen={openUploadFileDialog}
+        setIsOpen={setOpenUploadFileDialog}
+        onSubmit={() => {
+          // TODO: handleUploadFiles
+          setOpenUploadFileDialog(false);
+        }}
+      />
+      <NewFolderDialog
+        isOpen={openNewFolderDialog}
+        setIsOpen={setOpenNewFolderDialog}
+        onSubmit={() => {
+          // TODO: handleNewDirectory
+          setOpenNewFolderDialog(false);
+        }}
+      />
     </Stack>
   );
 };
