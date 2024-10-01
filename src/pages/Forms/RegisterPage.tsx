@@ -2,7 +2,6 @@ import { Button, Paper, Stack, TextField, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../../utils/ApiHandlers/AccountRegistrationHandler";
 
-// TODO: Implement RegisterPage
 const RegisterPage = () => {
   const navigate = useNavigate();
 

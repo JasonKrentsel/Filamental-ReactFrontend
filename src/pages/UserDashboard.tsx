@@ -1,22 +1,22 @@
 import { Box, Stack } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { OrgDescription } from "../utils/datatypes/Organization";
 import DashboardPageSelectSide from "../components/DashboardComponents/Organization/DashboardPageSelectSide";
 import { getUserOrgDescriptions } from "../utils/ApiHandlers/OrganizationInfoHandler";
+import AuthContext from "../context/AuthContext";
 
 const UserDashboard = () => {
+  const { accessToken } = useContext(AuthContext);
   const [userOrgs, setUserOrgs] = useState<OrgDescription[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOrg, setSelectedOrg] = useState<OrgDescription | null>(null);
 
   useEffect(() => {
-    const fetchUserOrgs = async () => {
-      const orgs = await getUserOrgDescriptions();
+    getUserOrgDescriptions(accessToken).then((orgs) => {
       setUserOrgs(orgs);
       setIsLoading(false);
-    };
-    fetchUserOrgs();
-  }, []);
+    });
+  }, [accessToken]);
 
   return (
     <Stack direction="row" height="100%" sx={{ overflow: "hidden" }}>

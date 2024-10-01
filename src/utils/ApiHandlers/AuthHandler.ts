@@ -14,7 +14,7 @@ export const getToken = async (
     password: password,
   };
 
-  const response = await axiosInstance.post("users/token/", data);
+  const response = await axiosInstance.post("/auth/token/", data);
 
   if (response.status === 200) {
     return response.data as AuthResponse;
@@ -30,7 +30,7 @@ export const getRefreshToken = async (
     refresh: refreshToken,
   };
 
-  const response = await axiosInstance.post("users/token/refresh/", data);
+  const response = await axiosInstance.post("/auth/token/refresh/", data);
 
   if (response.status === 200) {
     return response.data as AuthResponse;

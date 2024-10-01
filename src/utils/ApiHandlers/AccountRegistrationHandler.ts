@@ -13,6 +13,6 @@ export const registerUser = async (
     last_name: lastName,
   };
 
-  const response = await axiosInstance.post("/users/register/", data);
+  const response = await axiosInstance.post("/auth/register/", data);
   return response;
 };

@@ -36,8 +36,9 @@ const DashboardPageSelectSide = ({
         <Divider variant="middle" />
 
         {/* loop through and display user's orgs */}
-        {isLoading
-          ? Array(5)
+        {isLoading ? (
+          <>
+            {Array(5)
               .fill(null)
               .map((_, index) => (
                 <SelectableContainer key={index} selected={false}>
@@ -47,8 +48,12 @@ const DashboardPageSelectSide = ({
                     height={theme.spacing(7)}
                   />
                 </SelectableContainer>
-              ))
-          : userOrgs.map((org) => (
+              ))}
+            <Divider variant="middle" />
+          </>
+        ) : (
+          userOrgs.map((org) => (
+            <>
               <SelectableContainer
                 selected={selectedOrg?.org_id === org.org_id}
               >
@@ -58,9 +63,10 @@ const DashboardPageSelectSide = ({
                   fabProps={{ onClick: () => setSelectedOrg(org) }}
                 />
               </SelectableContainer>
-            ))}
-
-        <Divider variant="middle" />
+              <Divider variant="middle" />
+            </>
+          ))
+        )}
 
         <SelectableContainer selected={false}>
           <NewOrgButton />
