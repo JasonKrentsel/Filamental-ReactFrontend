@@ -13,10 +13,11 @@ export interface DecodedAuthToken {
   user_id: number;
 
   // custom token fields
-  username: string;
   email: string;
   organization_name: string;
   role: string;
+  first_name: string;
+  last_name: string;
 }
 
 // ------------------- Context -------------------
@@ -61,8 +62,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   /**
    * Handles user login.
    * This function is called from a form submission event.
-   * The form should have two inputs: username and password.
-   * It retrieves the username and password from the form,
+   * The form should have two inputs: email and password.
+   * It retrieves the email and password from the form,
    * attempts to get authentication tokens, and updates the state accordingly.
    * Use the promise returned by this function to navigate to the desired page after login.
    *
@@ -72,10 +73,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-    const username = formData.get("username") as string;
+    const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     try {
-      const { access, refresh } = await getToken(username, password);
+      const { access, refresh } = await getToken(email, password);
       setAccessToken(access);
       setRefreshToken(refresh);
       setUser(jwtDecode<DecodedAuthToken>(access));

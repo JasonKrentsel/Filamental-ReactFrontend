@@ -6,15 +6,15 @@ export interface AuthResponse {
 }
 
 export const getToken = async (
-  username: string,
+  email: string,
   password: string
 ): Promise<AuthResponse> => {
   const data = {
-    username: username,
+    email: email,
     password: password,
   };
 
-  const response = await axiosInstance.post("accounts/api/token/", data);
+  const response = await axiosInstance.post("users/token/", data);
 
   if (response.status === 200) {
     return response.data as AuthResponse;
@@ -30,10 +30,7 @@ export const getRefreshToken = async (
     refresh: refreshToken,
   };
 
-  const response = await axiosInstance.post(
-    "accounts/api/token/refresh/",
-    data
-  );
+  const response = await axiosInstance.post("users/token/refresh/", data);
 
   if (response.status === 200) {
     return response.data as AuthResponse;

@@ -38,7 +38,8 @@ const LoginPage = () => {
             <TextField
               variant="outlined"
               name="username"
-              placeholder="Enter Username"
+              type="email"
+              placeholder="Enter Email"
             />
             <TextField
               variant="outlined"
