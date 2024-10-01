@@ -1,78 +1,36 @@
-import {
-  Button,
-  Grow,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { useState } from "react";
+import { Button, Paper, Stack, TextField, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import {
-  registerUserWithJoinCode,
-  registerUserWithNewOrg,
-} from "../../utils/ApiHandlers/AccountRegistrationHandler";
-
-type registerChoice = "joinCode" | "newOrganization" | null;
+import { registerUser } from "../../utils/ApiHandlers/AccountRegistrationHandler";
 
 // TODO: Implement RegisterPage
 const RegisterPage = () => {
-  const [registerChoice, setRegisterChoice] = useState<registerChoice>(null);
   const navigate = useNavigate();
 
+  const onFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const email = formData.get("registerEmail") as string;
+    const emailConfirm = formData.get("registerEmailConfirm") as string;
+    const password = formData.get("registerPassword") as string;
+    const passwordConfirm = formData.get("registerPasswordConfirm") as string;
+    const firstName = formData.get("registerFirstName") as string;
+    const lastName = formData.get("registerLastName") as string;
+
+    if (email !== emailConfirm) {
+      alert("Email addresses do not match.");
+      return;
+    }
+    if (password !== passwordConfirm) {
+      alert("Passwords do not match.");
+      return;
+    }
+
+    registerUser(email, password, firstName, lastName).then(() => {
+      navigate("/login");
+    });
+  };
   return (
-    <form
-      onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-        // first form submit, next step is to show the join code or new organization form
-        e.preventDefault();
-        const formData = new FormData(e.target as HTMLFormElement);
-        const email = formData.get("registerEmail") as string;
-        const emailConfirm = formData.get("registerEmailConfirm") as string;
-        const password = formData.get("registerPassword") as string;
-        const passwordConfirm = formData.get(
-          "registerPasswordConfirm"
-        ) as string;
-        const firstName = formData.get("registerFirstName") as string;
-        const lastName = formData.get("registerLastName") as string;
-
-        // Check if email and password confirmation fields match
-        if (email !== emailConfirm) {
-          alert("Email addresses do not match.");
-          return;
-        }
-        if (password !== passwordConfirm) {
-          alert("Passwords do not match.");
-          return;
-        }
-
-        const afterResponse = () => {
-          setRegisterChoice(null);
-          navigate("/login");
-        };
-
-        if (registerChoice === "joinCode") {
-          const joinCode = formData.get("registerJoinCode") as string;
-          registerUserWithJoinCode(
-            email,
-            password,
-            firstName,
-            lastName,
-            joinCode
-          ).then(afterResponse);
-        } else if (registerChoice === "newOrganization") {
-          const organizationName = formData.get(
-            "registerOrganizationName"
-          ) as string;
-          registerUserWithNewOrg(
-            email,
-            password,
-            firstName,
-            lastName,
-            organizationName
-          ).then(afterResponse);
-        }
-      }}
-    >
+    <form onSubmit={onFormSubmit}>
       <Stack
         direction="row"
         paddingTop={5}
@@ -89,6 +47,7 @@ const RegisterPage = () => {
             paddingBottom: 5,
             paddingLeft: 5,
             paddingRight: 5,
+            width: "50%",
           }}
         >
           <Stack direction="column" spacing={2}>
@@ -140,73 +99,11 @@ const RegisterPage = () => {
               placeholder="Confirm Password"
               required
             />
-
-            <Typography variant="body1" sx={{ textDecoration: "underline" }}>
-              Select one of the options below:
-            </Typography>
-            <Stack spacing={1} justifyContent="center">
-              <Button
-                variant={
-                  registerChoice === "joinCode" ? "contained" : "outlined"
-                }
-                onClick={() => setRegisterChoice("joinCode")}
-              >
-                I have a join code
-              </Button>
-              <Button
-                variant={
-                  registerChoice === "newOrganization"
-                    ? "contained"
-                    : "outlined"
-                }
-                onClick={() => setRegisterChoice("newOrganization")}
-              >
-                I want to create a new organization
-              </Button>
-            </Stack>
+            <Button variant="contained" type="submit">
+              Register
+            </Button>
           </Stack>
         </Paper>
-
-        <Grow in={registerChoice !== null} timeout={1000}>
-          <Paper
-            sx={{
-              paddingTop: 5,
-              paddingBottom: 5,
-              paddingLeft: 5,
-              paddingRight: 5,
-            }}
-          >
-            <Stack spacing={1}>
-              {registerChoice === "joinCode" && (
-                <>
-                  <Typography variant="h6">Join Code</Typography>
-                  <TextField
-                    variant="outlined"
-                    name="registerJoinCode"
-                    placeholder="Enter Join Code"
-                  />
-                  <Button variant="contained" type="submit">
-                    Register User and Join Organization
-                  </Button>
-                </>
-              )}
-
-              {registerChoice === "newOrganization" && (
-                <>
-                  <Typography variant="h6">New Organization</Typography>
-                  <TextField
-                    variant="outlined"
-                    name="registerOrganizationName"
-                    placeholder="Enter Organization Name"
-                  />
-                  <Button variant="contained" type="submit">
-                    Register User and Organization
-                  </Button>
-                </>
-              )}
-            </Stack>
-          </Paper>
-        </Grow>
       </Stack>
     </form>
   );
