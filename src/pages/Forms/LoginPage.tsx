@@ -37,7 +37,7 @@ const LoginPage = () => {
             <Typography variant="h4">Login</Typography>
             <TextField
               variant="outlined"
-              name="username"
+              name="email"
               type="email"
               placeholder="Enter Email"
             />
