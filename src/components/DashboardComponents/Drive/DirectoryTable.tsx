@@ -1,4 +1,4 @@
-import { Directory } from "../../../utils/FileStructure/Directory";
+import { Directory } from "../../../utils/datatypes/Directory";
 import {
   Divider,
   Table,

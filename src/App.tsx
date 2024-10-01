@@ -3,13 +3,14 @@ import { AuthProvider } from "./context/AuthContext";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/Forms/LoginPage";
-import UserDashboard from "./pages/UserDashboard";
 
 import PrivateRoute from "./utils/PrivateRoute";
 import StyledHeader from "./components/HeaderComponents/StyledHeader";
 
 import { Stack } from "@mui/material";
 import RegisterPage from "./pages/Forms/RegisterPage";
+import OldUserDashboard from "./pages/OldUserDashboard";
+import UserDashboard from "./pages/UserDashboard";
 
 function App() {
   return (
@@ -35,6 +36,14 @@ function App() {
                 element={
                   <PrivateRoute>
                     <UserDashboard />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/old-dashboard"
+                element={
+                  <PrivateRoute>
+                    <OldUserDashboard />
                   </PrivateRoute>
                 }
               />

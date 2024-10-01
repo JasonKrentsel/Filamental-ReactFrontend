@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Directory } from "../../../utils/FileStructure/Directory";
-import { exampleRoot } from "../../../utils/FileStructure/Directory";
+import { Directory } from "../../../utils/datatypes/Directory";
+import { exampleRoot } from "../../../utils/datatypes/Directory";
 import { Breadcrumbs, Chip, Stack, Typography } from "@mui/material";
 import DirectoryTable from "./DirectoryTable";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";

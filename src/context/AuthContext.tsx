@@ -14,8 +14,6 @@ export interface DecodedAuthToken {
 
   // custom token fields
   email: string;
-  organization_name: string;
-  role: string;
   first_name: string;
   last_name: string;
 }

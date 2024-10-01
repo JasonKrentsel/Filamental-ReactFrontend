@@ -1,46 +1,35 @@
-import { Divider, Grid2, Paper, Stack, Typography } from "@mui/material";
-import DirectoryManagerCell from "../components/DashboardComponents/Drive/DirectoryManagerCell";
-
-const GRID_HEIGHT = "100%";
-const BORDER_RADIUS = "16px";
-
-const PAPER_STYLE = {
-  paddingRight: 2,
-  paddingLeft: 2,
-  paddingTop: 2,
-  paddingBottom: 2,
-};
+import { Box, Stack } from "@mui/material";
+import { useEffect, useState } from "react";
+import { OrgDescription } from "../utils/datatypes/Organization";
+import DashboardPageSelectSide from "../components/DashboardComponents/Organization/DashboardPageSelectSide";
+import { getUserOrgDescriptions } from "../utils/ApiHandlers/OrganizationInfoHandler";
 
 const UserDashboard = () => {
+  const [userOrgs, setUserOrgs] = useState<OrgDescription[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedOrg, setSelectedOrg] = useState<OrgDescription | null>(null);
+
+  useEffect(() => {
+    const fetchUserOrgs = async () => {
+      const orgs = await getUserOrgDescriptions();
+      setUserOrgs(orgs);
+      setIsLoading(false);
+    };
+    fetchUserOrgs();
+  }, []);
+
   return (
-    <Grid2
-      container
-      spacing={3}
-      sx={{ height: "100%", overflow: "scroll", padding: 3 }}
-    >
-      <Grid2 size={2} sx={{ height: "100%" }}>
-        <Paper sx={{ borderRadius: BORDER_RADIUS, ...PAPER_STYLE }}>
-          <Stack height={GRID_HEIGHT}>
-            <Typography variant="h6">Drive</Typography>
-            <Divider />
-            <Typography variant="h6">Chat</Typography>
-            <Divider />
-            <Typography variant="h6">Organization</Typography>
-          </Stack>
-        </Paper>
-      </Grid2>
-      <Grid2 size={10} sx={{ height: "100%", display: "flex" }}>
-        <Paper
-          sx={{
-            flexGrow: 1,
-            borderRadius: BORDER_RADIUS,
-            ...PAPER_STYLE,
-          }}
-        >
-          <DirectoryManagerCell />
-        </Paper>
-      </Grid2>
-    </Grid2>
+    <Stack direction="row" height="100%" sx={{ overflow: "hidden" }}>
+      <DashboardPageSelectSide
+        userOrgs={userOrgs}
+        selectedOrg={selectedOrg}
+        setSelectedOrg={setSelectedOrg}
+        isLoading={isLoading}
+      />
+      <Box flexGrow={1} bgcolor="green">
+        {selectedOrg ? selectedOrg.org_name : <div>Home</div>}
+      </Box>
+    </Stack>
   );
 };
 
