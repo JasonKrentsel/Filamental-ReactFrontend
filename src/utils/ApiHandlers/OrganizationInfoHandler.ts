@@ -1,19 +1,8 @@
-import { OrgDescription } from "../datatypes/Organization";
-import { getPrivateData } from "./PrivateAPIHandler";
-
-// const orgs: OrgDescription[] = [
-//   {
-//     org_name: "Org 1",
-//     org_icon_src:
-//       "https://onlinepngtools.com/images/examples-onlinepngtools/man-on-the-mountain-edge-avatar.png",
-//     org_id: "1",
-//   },
-//   {
-//     org_name: "Org 2",
-//     org_icon_src: "",
-//     org_id: "2",
-//   },
-// ];
+import {
+  OrgDescription,
+  NewOrganizationDescription,
+} from "../datatypes/Organization";
+import { getPrivateData, postPrivateData } from "./PrivateAPIHandler";
 
 export const getUserOrgDescriptions = async (
   accessToken: string
@@ -22,6 +11,18 @@ export const getUserOrgDescriptions = async (
     "api/user/org-descriptions/",
     accessToken
   );
-  console.log(response.data);
   return (response.data as OrgDescription[]) || [];
+};
+
+export const createOrganization = async (
+  newOrg: NewOrganizationDescription,
+  accessToken: string
+): Promise<OrgDescription> => {
+  console.log(newOrg);
+  const response = await postPrivateData(
+    newOrg,
+    "api/user/create-org/",
+    accessToken
+  );
+  return response.data as OrgDescription;
 };

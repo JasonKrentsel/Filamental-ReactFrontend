@@ -11,7 +11,10 @@ import { useTheme } from "@mui/material/styles";
 import { useContext, useEffect, useState } from "react";
 import NewOrgDialog from "./Dialogs/NewOrgDialog";
 import AuthContext from "../../../context/AuthContext";
-import { getUserOrgDescriptions } from "../../../utils/ApiHandlers/OrganizationInfoHandler";
+import {
+  createOrganization,
+  getUserOrgDescriptions,
+} from "../../../utils/ApiHandlers/OrganizationInfoHandler";
 
 interface DashboardPageSelectSideProps {
   selectedOrg: OrgDescription | null;
@@ -41,14 +44,9 @@ const DashboardPageSelectSide = ({
   }, [accessToken]);
 
   const handleNewOrgCreation = async (newOrg: NewOrganizationDescription) => {
-    console.log(newOrg);
-    // Simulating a 3-second delay
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    // TODO: Implement actual organization creation logic here
-    console.log("Organization created after 3-second delay:", newOrg);
-
-    refreshOrgList(accessToken);
+    createOrganization(newOrg, accessToken).then(() => {
+      refreshOrgList(accessToken);
+    });
   };
 
   return (
@@ -82,8 +80,8 @@ const DashboardPageSelectSide = ({
             <Divider variant="middle" />
           </>
         ) : (
-          userOrgs.map((org) => (
-            <>
+          <>
+            {userOrgs.map((org) => (
               <SelectableContainer
                 selected={selectedOrg?.org_id === org.org_id}
               >
@@ -93,9 +91,9 @@ const DashboardPageSelectSide = ({
                   fabProps={{ onClick: () => setSelectedOrg(org) }}
                 />
               </SelectableContainer>
-              <Divider variant="middle" />
-            </>
-          ))
+            ))}
+            <Divider variant="middle" />
+          </>
         )}
 
         <SelectableContainer selected={false}>

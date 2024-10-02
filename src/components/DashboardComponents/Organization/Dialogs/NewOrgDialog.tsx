@@ -36,7 +36,7 @@ const NewOrgDialog: React.FC<NewOrgDialogProps> = ({
           const formData = new FormData(e.target as HTMLFormElement);
           const organization_name = formData.get("organization_name");
           onSubmitOrg({
-            org_name: organization_name as string,
+            new_org_name: organization_name as string,
           } as NewOrganizationDescription).then(() => {
             setIsLoading(false);
             setIsOpen(false);

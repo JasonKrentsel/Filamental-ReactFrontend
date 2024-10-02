@@ -5,5 +5,5 @@ export type OrgDescription = {
 };
 
 export type NewOrganizationDescription = {
-  org_name: string;
+  new_org_name: string;
 };
