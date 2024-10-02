@@ -16,15 +16,15 @@ import {
   getUserOrgDescriptions,
 } from "../../../utils/ApiHandlers/OrganizationInfoHandler";
 
-interface DashboardPageSelectSideProps {
+interface DashboardSidebarProps {
   selectedOrg: OrgDescription | null;
   setSelectedOrg: (org: OrgDescription | null) => void;
 }
 
-const DashboardPageSelectSide = ({
+const DashboardSidebar = ({
   selectedOrg,
   setSelectedOrg,
-}: DashboardPageSelectSideProps) => {
+}: DashboardSidebarProps) => {
   const theme = useTheme();
   const { accessToken } = useContext(AuthContext);
   const [isNewOrgDialogOpen, setIsNewOrgDialogOpen] = useState(false);
@@ -54,9 +54,13 @@ const DashboardPageSelectSide = ({
       style={{
         height: "100%",
         overflow: "scroll",
+        borderRight: `1px solid ${theme.palette.divider}`,
       }}
     >
-      <Stack spacing={1} sx={{ paddingTop: 1, paddingBottom: 1 }}>
+      <Stack
+        spacing={1}
+        sx={{ width: "100%", paddingTop: 1, paddingBottom: 1 }}
+      >
         <SelectableContainer selected={selectedOrg === null}>
           <HomeButton onClick={() => setSelectedOrg(null)} />
         </SelectableContainer>
@@ -110,4 +114,4 @@ const DashboardPageSelectSide = ({
   );
 };
 
-export default DashboardPageSelectSide;
+export default DashboardSidebar;
