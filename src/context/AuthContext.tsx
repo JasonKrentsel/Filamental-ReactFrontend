@@ -113,8 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUser(jwtDecode<DecodedAuthToken>(access));
         localStorage.setItem("accessToken", access);
         localStorage.setItem("refreshToken", refresh);
-      } catch (error) {
-        console.error(error);
+      } catch {
         logout();
       }
     };

@@ -18,7 +18,7 @@ const OrgButton = ({ orgDescription, fabProps }: OrgButtonProps) => {
           />
         ) : (
           <Typography variant="h6">
-            {orgDescription.org_name[0].toUpperCase()}
+            {orgDescription.org_name.slice(0, 3).toUpperCase()}
           </Typography>
         )}
       </Fab>

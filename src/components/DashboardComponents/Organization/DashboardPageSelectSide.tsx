@@ -84,15 +84,15 @@ const DashboardPageSelectSide = ({
             {userOrgs.map((org) => (
               <SelectableContainer
                 selected={selectedOrg?.org_id === org.org_id}
+                key={org.org_id}
               >
                 <OrgButton
-                  key={org.org_id}
                   orgDescription={org}
                   fabProps={{ onClick: () => setSelectedOrg(org) }}
                 />
               </SelectableContainer>
             ))}
-            <Divider variant="middle" />
+            {userOrgs.length > 0 && <Divider variant="middle" />}
           </>
         )}
 
