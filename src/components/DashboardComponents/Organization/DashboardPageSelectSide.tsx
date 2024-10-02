@@ -2,24 +2,54 @@ import { Stack, Divider, Skeleton } from "@mui/material";
 import HomeButton from "./HomeButton";
 import OrgButton from "./OrgButton";
 import NewOrgButton from "./NewOrgButton";
-import { OrgDescription } from "../../../utils/datatypes/Organization";
+import {
+  NewOrganizationDescription,
+  OrgDescription,
+} from "../../../utils/datatypes/Organization";
 import SelectableContainer from "./SelectableContainer";
 import { useTheme } from "@mui/material/styles";
+import { useContext, useEffect, useState } from "react";
+import NewOrgDialog from "./Dialogs/NewOrgDialog";
+import AuthContext from "../../../context/AuthContext";
+import { getUserOrgDescriptions } from "../../../utils/ApiHandlers/OrganizationInfoHandler";
 
 interface DashboardPageSelectSideProps {
-  userOrgs: OrgDescription[];
   selectedOrg: OrgDescription | null;
   setSelectedOrg: (org: OrgDescription | null) => void;
-  isLoading: boolean;
 }
 
 const DashboardPageSelectSide = ({
-  userOrgs,
   selectedOrg,
   setSelectedOrg,
-  isLoading,
 }: DashboardPageSelectSideProps) => {
   const theme = useTheme();
+  const { accessToken } = useContext(AuthContext);
+  const [isNewOrgDialogOpen, setIsNewOrgDialogOpen] = useState(false);
+  const [userOrgs, setUserOrgs] = useState<OrgDescription[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const refreshOrgList = (accessToken: string) => {
+    setIsLoading(true);
+    getUserOrgDescriptions(accessToken).then((orgs: OrgDescription[]) => {
+      setUserOrgs(orgs);
+      setIsLoading(false);
+    });
+  };
+
+  useEffect(() => {
+    refreshOrgList(accessToken);
+  }, [accessToken]);
+
+  const handleNewOrgCreation = async (newOrg: NewOrganizationDescription) => {
+    console.log(newOrg);
+    // Simulating a 3-second delay
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    // TODO: Implement actual organization creation logic here
+    console.log("Organization created after 3-second delay:", newOrg);
+
+    refreshOrgList(accessToken);
+  };
 
   return (
     <div
@@ -69,8 +99,14 @@ const DashboardPageSelectSide = ({
         )}
 
         <SelectableContainer selected={false}>
-          <NewOrgButton />
+          <NewOrgButton onClick={() => setIsNewOrgDialogOpen(true)} />
         </SelectableContainer>
+
+        <NewOrgDialog
+          isOpen={isNewOrgDialogOpen}
+          setIsOpen={setIsNewOrgDialogOpen}
+          onSubmitOrg={handleNewOrgCreation}
+        />
       </Stack>
     </div>
   );
