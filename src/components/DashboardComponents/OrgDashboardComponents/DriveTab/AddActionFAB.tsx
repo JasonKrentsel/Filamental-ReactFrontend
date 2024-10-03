@@ -49,7 +49,7 @@ const AddActionFAB: React.FC<AddActionFABProps> = ({
   };
 
   return (
-    <div style={{ position: "absolute", bottom: 0, right: 0 }}>
+    <div style={{ position: "absolute", bottom: "3%", right: "3%" }}>
       {getFab(open)}
       <Popper
         open={open}

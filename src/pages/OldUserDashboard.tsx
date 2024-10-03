@@ -1,5 +1,5 @@
 import { Divider, Grid2, Paper, Stack, Typography } from "@mui/material";
-import DirectoryManagerCell from "../components/DashboardComponents/Drive/DirectoryManagerCell";
+import DriveTab from "../components/DashboardComponents/OrgDashboardComponents/DriveTab/DriveTab";
 
 const GRID_HEIGHT = "100%";
 const BORDER_RADIUS = "16px";
@@ -37,7 +37,7 @@ const OldUserDashboard = () => {
             ...PAPER_STYLE,
           }}
         >
-          <DirectoryManagerCell />
+          <DriveTab />
         </Paper>
       </Grid2>
     </Grid2>

@@ -1,4 +1,3 @@
-import { Directory } from "../../../utils/datatypes/Directory";
 import {
   Divider,
   Table,
@@ -15,10 +14,15 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import FilePresentIcon from "@mui/icons-material/FilePresent";
 
 import CustomTableCell from "./CustomTableCell";
+import {
+  DirectoryContents,
+  SubDirectoryDescription,
+} from "../../../../utils/ApiHandlers/DriveActionHandler";
+
 interface DirectoryTableProps {
-  currentDirectory: Directory;
+  currentDirectoryContents: DirectoryContents;
   handleSelect: (name: string, event: React.MouseEvent) => void;
-  handleEnterDir: (subdirectory: Directory) => void;
+  handleEnterDir: (subdirectory: SubDirectoryDescription) => void;
   selectedItems: Set<string>;
 }
 
@@ -32,7 +36,7 @@ const formatFileSize = (bytes: number) => {
 };
 
 const DirectoryTable = ({
-  currentDirectory,
+  currentDirectoryContents,
   handleSelect,
   handleEnterDir,
   selectedItems,
@@ -61,7 +65,7 @@ const DirectoryTable = ({
         {/* table body */}
         <TableBody>
           {/* subdirectories */}
-          {currentDirectory.subdirectories.map((subdirectory) => (
+          {currentDirectoryContents.sub_directories.map((subdirectory) => (
             <TableRow
               key={subdirectory.name}
               onClick={(event) => handleSelect(subdirectory.name, event)}
@@ -93,21 +97,12 @@ const DirectoryTable = ({
                 {subdirectory.created_at.toLocaleDateString()}
               </CustomTableCell>
               {/* file size */}
-              <CustomTableCell>
-                <FilePresentIcon />
-                {subdirectory.files.length +
-                  subdirectory.subdirectories.length}{" "}
-                {subdirectory.files.length +
-                  subdirectory.subdirectories.length ===
-                1
-                  ? "Item"
-                  : "Items"}
-              </CustomTableCell>
+              <CustomTableCell>-</CustomTableCell>
             </TableRow>
           ))}
 
           {/* files */}
-          {currentDirectory.files.map((file) => (
+          {currentDirectoryContents.files.map((file) => (
             <TableRow
               key={file.name}
               onClick={(event) => handleSelect(file.name, event)}

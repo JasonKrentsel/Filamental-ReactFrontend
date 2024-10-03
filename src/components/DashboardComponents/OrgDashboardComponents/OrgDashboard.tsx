@@ -1,43 +1,37 @@
-import { useContext, useEffect, useState } from "react";
-import AuthContext from "../../../context/AuthContext";
-import {
-  OrgDashboardData,
-  OrgDescription,
-} from "../../../utils/datatypes/Organization";
-import { getOrgDashboardDataByID } from "../../../utils/ApiHandlers/OrganizationInfoHandler";
+import { useState } from "react";
+import { OrgDescription } from "../../../utils/ApiHandlers/OrganizationInfoHandler";
 import { Tabs, Tab, Box } from "@mui/material";
+import DriveTab from "./DriveTab/DriveTab";
 
 interface OrgDashboardProps {
-  orgDescription: OrgDescription;
+  currentOrg: OrgDescription;
 }
 
-const OrgDashboard = ({ orgDescription }: OrgDashboardProps) => {
-  const { accessToken } = useContext(AuthContext);
-  const [orgDashboardData, setOrgDashboardData] =
-    useState<OrgDashboardData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    getOrgDashboardDataByID(orgDescription.org_id, accessToken).then((data) => {
-      setOrgDashboardData(data);
-      setIsLoading(false);
-    });
-  }, [orgDescription, accessToken]);
-
-  if (isLoading || !orgDashboardData) {
-    return <div>Loading...</div>;
-  }
+const OrgDashboard = ({ currentOrg }: OrgDashboardProps) => {
+  const [selectedTab, setSelectedTab] = useState(0);
 
   return (
-    <Box height="100%" width="100%" display="flex" flexDirection="column">
-      <Tabs>
+    <Box width="100%" height="100%" display="flex" flexDirection="column">
+      <Tabs
+        value={selectedTab}
+        onChange={(_, newValue) => setSelectedTab(newValue)}
+        centered
+      >
         <Tab label="Drive" />
         <Tab label="Chat" />
         <Tab label="Organization" />
       </Tabs>
-      <p>orgId: {orgDashboardData.org_id}</p>
-      <p>orgName: {orgDashboardData.org_name}</p>
-      <p>orgIconSrc: {orgDashboardData.org_icon_src}</p>
+      <Box flexGrow={1} margin={1} borderRadius={2} overflow="hidden">
+        <Box sx={{ display: selectedTab === 0 ? "block" : "none" }}>
+          <DriveTab currentOrg={currentOrg} />
+        </Box>
+        <Box sx={{ display: selectedTab === 1 ? "block" : "none" }}>
+          {/* Chat tab content */}
+        </Box>
+        <Box sx={{ display: selectedTab === 2 ? "block" : "none" }}>
+          {/* Organization tab content */}
+        </Box>
+      </Box>
     </Box>
   );
 };

@@ -1,6 +1,6 @@
 import { Box, Stack } from "@mui/material";
 import { useState } from "react";
-import { OrgDescription } from "../utils/datatypes/Organization";
+import { OrgDescription } from "../utils/ApiHandlers/OrganizationInfoHandler";
 import DashboardSidebar from "../components/DashboardComponents/DashboardSidebarComponents/DashboardSidebar";
 import OrgDashboard from "../components/DashboardComponents/OrgDashboardComponents/OrgDashboard";
 import HomeDashboard from "../components/DashboardComponents/HomeDashboardComponents/HomeDashboard";
@@ -18,7 +18,8 @@ const UserDashboard = () => {
       </Box>
       <Box flexGrow={1}>
         {selectedOrg ? (
-          <OrgDashboard key={selectedOrg.org_id} orgDescription={selectedOrg} />
+          // key required so that OrgDashboard properly reloads on selectedOrg change
+          <OrgDashboard key={selectedOrg.org_id} currentOrg={selectedOrg} />
         ) : (
           <HomeDashboard />
         )}
