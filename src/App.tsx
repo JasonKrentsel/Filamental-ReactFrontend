@@ -9,7 +9,6 @@ import StyledHeader from "./components/HeaderComponents/StyledHeader";
 
 import { Stack } from "@mui/material";
 import RegisterPage from "./pages/Forms/RegisterPage";
-import OldUserDashboard from "./pages/OldUserDashboard";
 import UserDashboard from "./pages/UserDashboard";
 
 function App() {
@@ -36,14 +35,6 @@ function App() {
                 element={
                   <PrivateRoute>
                     <UserDashboard />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/old-dashboard"
-                element={
-                  <PrivateRoute>
-                    <OldUserDashboard />
                   </PrivateRoute>
                 }
               />
