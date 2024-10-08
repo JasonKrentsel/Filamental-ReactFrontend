@@ -20,7 +20,7 @@ import {
 } from "../../../../utils/ApiHandlers/DriveActionHandler";
 
 interface DirectoryTableProps {
-  currentDirectoryContents: DirectoryContents;
+  currentDirectoryContents: DirectoryContents | null;
   handleSelect: (name: string, event: React.MouseEvent) => void;
   handleEnterDir: (subdirectory: SubDirectoryDescription) => void;
   selectedItems: Set<string>;
@@ -65,7 +65,7 @@ const DirectoryTable = ({
         {/* table body */}
         <TableBody>
           {/* subdirectories */}
-          {currentDirectoryContents.sub_directories.map((subdirectory) => (
+          {currentDirectoryContents?.sub_directories.map((subdirectory) => (
             <TableRow
               key={subdirectory.name}
               onClick={(event) => handleSelect(subdirectory.name, event)}
@@ -102,7 +102,7 @@ const DirectoryTable = ({
           ))}
 
           {/* files */}
-          {currentDirectoryContents.files.map((file) => (
+          {currentDirectoryContents?.files.map((file) => (
             <TableRow
               key={file.name}
               onClick={(event) => handleSelect(file.name, event)}

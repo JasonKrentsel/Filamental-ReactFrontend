@@ -17,11 +17,13 @@ import { useState } from "react";
 interface AddActionFABProps {
   onUploadFileDialog: () => void;
   onNewFolderDialog: () => void;
+  disabled?: boolean;
 }
 
 const AddActionFAB: React.FC<AddActionFABProps> = ({
   onUploadFileDialog,
   onNewFolderDialog,
+  disabled = false,
 }) => {
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -38,11 +40,21 @@ const AddActionFAB: React.FC<AddActionFABProps> = ({
 
   const getFab = (open: boolean) => {
     return open ? (
-      <Fab color="secondary" aria-label="add" onClick={handleClick}>
+      <Fab
+        color="secondary"
+        aria-label="add"
+        onClick={handleClick}
+        disabled={disabled}
+      >
         <ArrowUpwardIcon />
       </Fab>
     ) : (
-      <Fab color="primary" aria-label="add" onClick={handleClick}>
+      <Fab
+        color="primary"
+        aria-label="add"
+        onClick={handleClick}
+        disabled={disabled}
+      >
         <AddIcon />
       </Fab>
     );

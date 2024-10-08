@@ -22,9 +22,6 @@ export type DirectoryContents = {
   sub_directories: SubDirectoryDescription[];
 };
 
-// TODO: Implement this
-// if directory_id is -1, get the root directory
-// else get the directory with the given directory_id
 export const getDirectoryContentsByID = async (
   access_token: string,
   directory_id: string
@@ -33,7 +30,8 @@ export const getDirectoryContentsByID = async (
     `api/organization/get-folder-by-id/${directory_id}/`,
     access_token
   );
-  return response.data as DirectoryContents;
+
+  return response?.data as DirectoryContents;
 };
 
 // TODO: Implement this

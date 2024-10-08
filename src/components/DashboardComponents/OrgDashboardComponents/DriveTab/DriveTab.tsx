@@ -23,7 +23,14 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
   const [currentDirectory, setCurrentDirectory] =
     useState<DirectoryContents | null>(null);
 
-  const [directoryStack, setDirectoryStack] = useState<DirectoryContents[]>([]);
+  const [directoryStack, setDirectoryStack] = useState<DirectoryContents[]>([
+    {
+      directory_id: currentOrg.org_root_directory_id,
+      name: "Loading...",
+      files: [],
+      sub_directories: [],
+    },
+  ]);
 
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const tableRef = useRef<HTMLDivElement>(null);
@@ -90,10 +97,6 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
     };
   }, [accessToken, currentOrg.org_root_directory_id]);
 
-  if (isLoading || !currentDirectory) {
-    return <p>Loading...</p>;
-  }
-
   return (
     <Box
       sx={{
@@ -146,6 +149,7 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
         <AddActionFAB
           onUploadFileDialog={() => setOpenUploadFileDialog(true)}
           onNewFolderDialog={() => setOpenNewFolderDialog(true)}
+          disabled={isLoading || !currentDirectory}
         />
 
         {/* Dialogs */}
@@ -153,22 +157,26 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
           isOpen={openUploadFileDialog}
           setIsOpen={setOpenUploadFileDialog}
           onSubmit={(files: FileList) => {
-            return handleUploadFiles(
-              accessToken,
-              currentDirectory.directory_id,
-              files
-            );
+            return currentDirectory
+              ? handleUploadFiles(
+                  accessToken,
+                  currentDirectory.directory_id,
+                  files
+                )
+              : Promise.reject(new Error("No current directory"));
           }}
         />
         <NewFolderDialog
           isOpen={openNewFolderDialog}
           setIsOpen={setOpenNewFolderDialog}
           onSubmit={(newFolderName: string) => {
-            return handleNewDirectory(
-              accessToken,
-              currentDirectory.directory_id,
-              newFolderName
-            );
+            return currentDirectory
+              ? handleNewDirectory(
+                  accessToken,
+                  currentDirectory.directory_id,
+                  newFolderName
+                )
+              : Promise.reject(new Error("No current directory"));
           }}
         />
       </Stack>
