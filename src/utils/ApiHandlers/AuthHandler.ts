@@ -23,7 +23,7 @@ export const getToken = async (
   }
 };
 
-export const getRefreshToken = async (
+export const refreshTokens = async (
   refreshToken: string
 ): Promise<AuthResponse> => {
   const data = {
@@ -33,6 +33,7 @@ export const getRefreshToken = async (
   const response = await axiosInstance.post("/auth/token/refresh/", data);
 
   if (response.status === 200) {
+    console.log("Tokens refreshed");
     return response.data as AuthResponse;
   } else {
     throw new Error("Failed to refresh token");

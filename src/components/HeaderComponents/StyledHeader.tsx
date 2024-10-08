@@ -8,7 +8,7 @@ import AuthContext from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const StyledHeader = () => {
-  const { user } = useContext(AuthContext);
+  const { isLoggedIn } = useContext(AuthContext);
   const navigate = useNavigate();
 
   return (
@@ -36,7 +36,7 @@ const StyledHeader = () => {
 
         <Box>
           {/* Right-aligned content */}
-          {user ? (
+          {isLoggedIn ? (
             <>
               <Button
                 variant="contained"

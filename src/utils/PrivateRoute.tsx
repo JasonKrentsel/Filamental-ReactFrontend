@@ -14,9 +14,9 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   children,
 }) => {
   const location = useLocation();
-  const { user } = useContext(AuthContext);
+  const { isLoggedIn } = useContext(AuthContext);
 
-  if (!user) {
+  if (!isLoggedIn) {
     // Redirect if not authenticated, preserving the location state
     return <Navigate to={redirectPath} state={{ from: location }} replace />;
   }

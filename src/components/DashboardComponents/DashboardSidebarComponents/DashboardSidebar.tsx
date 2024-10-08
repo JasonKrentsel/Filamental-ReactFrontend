@@ -5,7 +5,7 @@ import NewOrgButton from "./NewOrgButton";
 import {
   NewOrganizationDescription,
   OrgDescription,
-} from "../../../utils/datatypes/Organization";
+} from "../../../utils/ApiHandlers/OrganizationInfoHandler";
 import SelectableContainer from "./SelectableContainer";
 import { useTheme } from "@mui/material/styles";
 import { useContext, useEffect, useState } from "react";

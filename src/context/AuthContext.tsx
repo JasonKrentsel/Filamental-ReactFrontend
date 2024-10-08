@@ -1,7 +1,11 @@
-import React, { createContext, useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
-
-import { getRefreshToken, getToken } from "../utils/ApiHandlers/AuthHandler.ts";
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { refreshTokens, getToken } from "../utils/ApiHandlers/AuthHandler.ts";
 
 // ------------------- Interfaces -------------------
 // UPDATE INTERFACE WHEN UPDATING BACKEND AUTH TOKEN RESPONSE
@@ -21,7 +25,7 @@ export interface DecodedAuthToken {
 // ------------------- Context -------------------
 
 interface AuthContextType {
-  user: DecodedAuthToken | null;
+  isLoggedIn: boolean;
   accessToken: string;
   refreshToken: string;
   login: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
@@ -29,7 +33,7 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType>({
-  user: null,
+  isLoggedIn: false,
   accessToken: "",
   refreshToken: "",
   login: async () => {},
@@ -43,18 +47,15 @@ export default AuthContext;
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  // load tokens from local storage, if they exist
-  const [accessToken, setAccessToken] = useState<string>(
-    () => localStorage.getItem("accessToken") || ""
+  // Use useRef for tokens
+  const accessTokenRef = useRef<string>(
+    localStorage.getItem("accessToken") || ""
   );
-  const [refreshToken, setRefreshToken] = useState<string>(
-    () => localStorage.getItem("refreshToken") || ""
+  const refreshTokenRef = useRef<string>(
+    localStorage.getItem("refreshToken") || ""
   );
 
-  // create user state
-  const [user, setUser] = useState<DecodedAuthToken | null>(() =>
-    accessToken ? jwtDecode<DecodedAuthToken>(accessToken) : null
-  );
+  const [isLoggedIn, setIsLoggedIn] = useState(accessTokenRef.current !== "");
 
   /**
    * Handles user login.
@@ -74,60 +75,86 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const password = formData.get("password") as string;
     try {
       const { access, refresh } = await getToken(email, password);
-      setAccessToken(access);
-      setRefreshToken(refresh);
-      setUser(jwtDecode<DecodedAuthToken>(access));
+      accessTokenRef.current = access;
+      refreshTokenRef.current = refresh;
       localStorage.setItem("accessToken", access);
       localStorage.setItem("refreshToken", refresh);
+      setIsLoggedIn(true);
     } catch (error) {
       console.error(error);
     }
   };
 
-  // logout function
+  /**
+   * Handles user logout.
+   * This function clears the access and refresh tokens from both the current session
+   * and local storage, effectively logging out the user.
+   *
+   * THIS DOES NOT RERENDER THE APP, OR NAVIGATE TO ANY PAGE
+   * THAT FUNCTIONALITY IS UP TO THE COMPONENT USING THIS CONTEXT
+   *
+   * After calling this function, the user will be considered logged out,
+   * and any authenticated API calls will fail until the user logs in again.
+   *
+   * @returns {void}
+   */
   const logout = () => {
-    setUser(null);
-    setAccessToken("");
-    setRefreshToken("");
+    accessTokenRef.current = "";
+    refreshTokenRef.current = "";
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    setIsLoggedIn(false);
   };
 
-  // context value, which is passed to the AuthContext.Provider
-  const contextValue: AuthContextType = {
-    user,
-    accessToken,
-    refreshToken,
-    login,
-    logout,
-  };
+  /**
+   * Updates the authentication tokens.
+   * This function is used to refresh the access token when it is expired.
+   * It retrieves the new access and refresh tokens from the server and updates the state accordingly.
+   * If the refresh token is invalid, it calls the logout function.
+   *
+   * @returns {void}
+   */
+  const updateAuthTokens = useCallback(async () => {
+    try {
+      const { access, refresh } = await refreshTokens(refreshTokenRef.current);
+      accessTokenRef.current = access;
+      refreshTokenRef.current = refresh;
+      localStorage.setItem("accessToken", access);
+      localStorage.setItem("refreshToken", refresh);
+    } catch {
+      logout();
+    }
+  }, []);
 
+  /**
+   * Sets up an interval to update the authentication tokens
+   * This is used to keep the access token fresh for the duration of the session.
+   *
+   * @returns {void}
+   */
   useEffect(() => {
-    const updateAuthTokens = async () => {
-      console.log("Updating auth tokens");
-      try {
-        const { access, refresh } = await getRefreshToken(refreshToken);
-        setAccessToken(access);
-        setRefreshToken(refresh);
-        setUser(jwtDecode<DecodedAuthToken>(access));
-        localStorage.setItem("accessToken", access);
-        localStorage.setItem("refreshToken", refresh);
-      } catch {
-        logout();
-      }
-    };
-
+    if (isLoggedIn) {
+      updateAuthTokens();
+    }
     // 4 minutes
     const timeInterval = 1000 * 60 * 4;
     const intervalId = setInterval(() => {
-      if (accessToken && refreshToken) {
+      if (isLoggedIn) {
         updateAuthTokens();
       }
     }, timeInterval);
     return () => clearInterval(intervalId);
-  }, [accessToken, refreshToken]);
+  }, [updateAuthTokens, isLoggedIn]);
 
-  // return the AuthContext.Provider with the context value
+  // context value, which is passed to the AuthContext.Provider
+  const contextValue: AuthContextType = {
+    isLoggedIn: isLoggedIn,
+    accessToken: accessTokenRef.current,
+    refreshToken: refreshTokenRef.current,
+    login,
+    logout,
+  };
+
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );

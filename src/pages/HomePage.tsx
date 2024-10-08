@@ -6,7 +6,7 @@ import AuthContext from "../context/AuthContext";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { isLoggedIn } = useContext(AuthContext);
   return (
     <>
       <div
@@ -22,7 +22,7 @@ const HomePage = () => {
         <p>Your smart drive service</p>
         <p>Homepage under construction</p>
 
-        {user ? (
+        {isLoggedIn ? (
           <Button
             variant="contained"
             color="primary"
