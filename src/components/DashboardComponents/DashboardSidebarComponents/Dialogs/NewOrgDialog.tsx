@@ -7,7 +7,7 @@ import {
   Button,
   Box,
 } from "@mui/material";
-import { NewOrganizationDescription } from "../../../../utils/datatypes/Organization";
+import { NewOrganizationDescription } from "../../../../utils/ApiHandlers/OrganizationInfoHandler";
 import { useState } from "react";
 import LoadingButton from "@mui/lab/LoadingButton";
 

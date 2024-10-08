@@ -10,6 +10,8 @@ import { OrgDescription } from "../../../../utils/ApiHandlers/OrganizationInfoHa
 import {
   DirectoryContents,
   getDirectoryContentsByID,
+  handleNewDirectory,
+  handleUploadFiles,
   SubDirectoryDescription,
 } from "../../../../utils/ApiHandlers/DriveActionHandler";
 
@@ -150,17 +152,23 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
         <UploadFileDialog
           isOpen={openUploadFileDialog}
           setIsOpen={setOpenUploadFileDialog}
-          onSubmit={() => {
-            // TODO: handleUploadFiles
-            setOpenUploadFileDialog(false);
+          onSubmit={(files: FileList) => {
+            return handleUploadFiles(
+              accessToken,
+              currentDirectory.directory_id,
+              files
+            );
           }}
         />
         <NewFolderDialog
           isOpen={openNewFolderDialog}
           setIsOpen={setOpenNewFolderDialog}
-          onSubmit={() => {
-            // TODO: handleNewDirectory
-            setOpenNewFolderDialog(false);
+          onSubmit={(newFolderName: string) => {
+            return handleNewDirectory(
+              accessToken,
+              currentDirectory.directory_id,
+              newFolderName
+            );
           }}
         />
       </Stack>

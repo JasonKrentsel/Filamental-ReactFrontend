@@ -50,7 +50,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [refreshToken, setRefreshToken] = useState<string>(
     () => localStorage.getItem("refreshToken") || ""
   );
-  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // create user state
   const [user, setUser] = useState<DecodedAuthToken | null>(() =>
@@ -118,13 +117,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     };
 
-    if (isLoading) {
-      if (accessToken && refreshToken) {
-        updateAuthTokens();
-      }
-      setIsLoading(false);
-    }
-
     // 4 minutes
     const timeInterval = 1000 * 60 * 4;
     const intervalId = setInterval(() => {
@@ -133,7 +125,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     }, timeInterval);
     return () => clearInterval(intervalId);
-  }, [isLoading, accessToken, refreshToken]);
+  }, [accessToken, refreshToken]);
 
   // return the AuthContext.Provider with the context value
   return (

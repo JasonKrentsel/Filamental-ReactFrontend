@@ -1,3 +1,4 @@
+import { LoadingButton } from "@mui/lab";
 import {
   Dialog,
   DialogTitle,
@@ -10,7 +11,7 @@ import { useState } from "react";
 interface UploadFileDialogProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  onSubmit: (files: FileList) => void;
+  onSubmit: (files: FileList) => Promise<void>;
 }
 
 const UploadFileDialog: React.FC<UploadFileDialogProps> = ({
@@ -19,6 +20,7 @@ const UploadFileDialog: React.FC<UploadFileDialogProps> = ({
   onSubmit,
 }) => {
   const [fileList, setFileList] = useState<FileList | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <Dialog
@@ -28,11 +30,20 @@ const UploadFileDialog: React.FC<UploadFileDialogProps> = ({
         component: "form",
         onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
           e.preventDefault();
-          if (fileList) {
-            onSubmit(fileList);
+          if (!fileList) {
+            return;
           }
-          setFileList(null);
-          setIsOpen(false);
+          setIsLoading(true);
+          onSubmit(fileList)
+            .then(() => {
+              setFileList(null);
+              setIsLoading(false);
+              setIsOpen(false);
+            })
+            .catch((error) => {
+              console.error(error);
+              setIsLoading(false);
+            });
         },
       }}
     >
@@ -41,13 +52,24 @@ const UploadFileDialog: React.FC<UploadFileDialogProps> = ({
         <input
           type="file"
           multiple
-          onChange={(e) => setFileList(e.target.files)}
+          onChange={(e) => {
+            if (e.target.files && e.target.files.length > 0) {
+              setFileList(e.target.files);
+            }
+          }}
           required
         />
       </DialogContent>
       <DialogActions>
         <Button onClick={() => setIsOpen(false)}>Cancel</Button>
-        <Button type="submit">Upload</Button>
+        <LoadingButton
+          variant="contained"
+          loading={isLoading}
+          type="submit"
+          disabled={!fileList}
+        >
+          Upload
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

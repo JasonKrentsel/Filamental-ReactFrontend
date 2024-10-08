@@ -16,7 +16,7 @@ export type SubDirectoryDescription = {
 };
 
 export type DirectoryContents = {
-  current_directory_id: string;
+  directory_id: string;
   name: string;
   files: FileDescription[];
   sub_directories: SubDirectoryDescription[];
@@ -36,26 +36,26 @@ export const getDirectoryContentsByID = async (
   return response.data as DirectoryContents;
 };
 
-// // TODO: Implement this
-// export const handleUploadFiles = async (
-//   access_token: string,
-//   directory_id: string,
-//   files: File[]
-// ): Promise<void> => {
-//   // Simulate API call with a 3-second delay
-//   await new Promise((resolve) => setTimeout(resolve, 3000));
+// TODO: Implement this
+export const handleUploadFiles = async (
+  access_token: string,
+  directory_id: string,
+  files: FileList
+): Promise<void> => {
+  // Simulate API call with a 3-second delay
+  await new Promise((resolve) => setTimeout(resolve, 3000));
 
-//   return;
-// };
+  return;
+};
 
-// // TODO: Implement this
-// export const handleNewDirectory = async (
-//   access_token: string,
-//   parent_directory_id: string,
-//   directory_name: string
-// ): Promise<void> => {
-//   // Simulate API call with a 3-second delay
-//   await new Promise((resolve) => setTimeout(resolve, 3000));
+// TODO: Implement this
+export const handleNewDirectory = async (
+  access_token: string,
+  parent_directory_id: string,
+  directory_name: string
+): Promise<void> => {
+  // Simulate API call with a 3-second delay
+  await new Promise((resolve) => setTimeout(resolve, 3000));
 
-//   return;
-// };
+  return;
+};

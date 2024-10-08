@@ -8,11 +8,12 @@ import {
   Button,
   Box,
 } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 
 interface NewFolderDialogProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  onSubmit: (newFolderName: string) => void;
+  onSubmit: (newFolderName: string) => Promise<void>;
 }
 
 const NewFolderDialog: React.FC<NewFolderDialogProps> = ({
@@ -21,6 +22,7 @@ const NewFolderDialog: React.FC<NewFolderDialogProps> = ({
   onSubmit,
 }) => {
   const [folderName, setFolderName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // TODO: add validation for folder name
   return (
@@ -30,10 +32,18 @@ const NewFolderDialog: React.FC<NewFolderDialogProps> = ({
       PaperProps={{
         component: "form",
         onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
+          setIsLoading(true);
           e.preventDefault();
-          onSubmit(folderName);
-          setFolderName("");
-          setIsOpen(false);
+          onSubmit(folderName)
+            .then(() => {
+              setFolderName("");
+              setIsLoading(false);
+              setIsOpen(false);
+            })
+            .catch((error) => {
+              console.error(error);
+              setIsLoading(false);
+            });
         },
       }}
     >
@@ -50,7 +60,14 @@ const NewFolderDialog: React.FC<NewFolderDialogProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={() => setIsOpen(false)}>Cancel</Button>
-        <Button type="submit">Create</Button>
+        <LoadingButton
+          variant="contained"
+          loading={isLoading}
+          type="submit"
+          disabled={!folderName}
+        >
+          Create
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );
