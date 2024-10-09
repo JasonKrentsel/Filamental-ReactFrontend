@@ -90,7 +90,19 @@ const UploadFileRow = ({
             }
             placement="top"
           >
-            <IconButton onClick={() => handleUpload(file)}>
+            <IconButton
+              onClick={() => {
+                setStatus("uploading");
+                handleUpload(file)
+                  .then(() => {
+                    setStatus("success");
+                  })
+                  .catch((e) => {
+                    setStatus("failed");
+                    setError(e.response.data["error"]);
+                  });
+              }}
+            >
               <ErrorIcon fontSize="large" color="error" />
             </IconButton>
           </Tooltip>
