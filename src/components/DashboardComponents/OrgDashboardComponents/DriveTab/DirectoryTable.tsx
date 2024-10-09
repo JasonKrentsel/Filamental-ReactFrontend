@@ -16,13 +16,13 @@ import FilePresentIcon from "@mui/icons-material/FilePresent";
 import CustomTableCell from "./CustomTableCell";
 import {
   DirectoryContents,
-  SubDirectoryDescription,
+  DirectoryDescription,
 } from "../../../../utils/ApiHandlers/DriveActionHandler";
 
 interface DirectoryTableProps {
   currentDirectoryContents: DirectoryContents | null;
   handleSelect: (name: string, event: React.MouseEvent) => void;
-  handleEnterDir: (subdirectory: SubDirectoryDescription) => void;
+  handleEnterDir: (directory_id: string) => void;
   selectedItems: Set<string>;
 }
 
@@ -65,53 +65,59 @@ const DirectoryTable = ({
         {/* table body */}
         <TableBody>
           {/* subdirectories */}
-          {currentDirectoryContents?.sub_directories.map((subdirectory) => (
-            <TableRow
-              key={subdirectory.name}
-              onClick={(event) => handleSelect(subdirectory.name, event)}
-              onDoubleClick={() => handleEnterDir(subdirectory)}
-              sx={{
-                backgroundColor: selectedItems.has(subdirectory.name)
-                  ? "#e0f7fa"
-                  : "transparent",
-                "&:hover": {
-                  backgroundColor: selectedItems.has(subdirectory.name)
-                    ? "#e0f7fa" // Keep selection color on hover if selected
-                    : "#f5f5f5", // Slightly greyer on hover if not selected
-                },
-              }}
-            >
-              {/* name */}
-              <CustomTableCell>
-                <FolderIcon />
-                {subdirectory.name}
-              </CustomTableCell>
-              {/* created by */}
-              <CustomTableCell>
-                <PersonIcon />
-                {subdirectory.created_by}
-              </CustomTableCell>
-              {/* created at */}
-              <CustomTableCell>
-                <CalendarMonthIcon />
-                {subdirectory.created_at.toLocaleDateString()}
-              </CustomTableCell>
-              {/* file size */}
-              <CustomTableCell>-</CustomTableCell>
-            </TableRow>
-          ))}
+          {currentDirectoryContents?.sub_directories.map(
+            (subdirectory: DirectoryDescription) => (
+              <TableRow
+                key={subdirectory.directory_id}
+                onClick={(event) =>
+                  handleSelect(subdirectory.directory_id, event)
+                }
+                onDoubleClick={() => handleEnterDir(subdirectory.directory_id)}
+                sx={{
+                  backgroundColor: selectedItems.has(subdirectory.directory_id)
+                    ? "#e0f7fa"
+                    : "transparent",
+                  "&:hover": {
+                    backgroundColor: selectedItems.has(
+                      subdirectory.directory_id
+                    )
+                      ? "#e0f7fa" // Keep selection color on hover if selected
+                      : "#f5f5f5", // Slightly greyer on hover if not selected
+                  },
+                }}
+              >
+                {/* name */}
+                <CustomTableCell>
+                  <FolderIcon />
+                  {subdirectory.name}
+                </CustomTableCell>
+                {/* created by */}
+                <CustomTableCell>
+                  <PersonIcon />
+                  {subdirectory.created_by}
+                </CustomTableCell>
+                {/* created at */}
+                <CustomTableCell>
+                  <CalendarMonthIcon />
+                  {subdirectory.created_at}
+                </CustomTableCell>
+                {/* file size */}
+                <CustomTableCell>-</CustomTableCell>
+              </TableRow>
+            )
+          )}
 
           {/* files */}
           {currentDirectoryContents?.files.map((file) => (
             <TableRow
-              key={file.name}
-              onClick={(event) => handleSelect(file.name, event)}
+              key={file.file_id}
+              onClick={(event) => handleSelect(file.file_id, event)}
               sx={{
-                backgroundColor: selectedItems.has(file.name)
+                backgroundColor: selectedItems.has(file.file_id)
                   ? "#e0f7fa"
                   : "transparent",
                 "&:hover": {
-                  backgroundColor: selectedItems.has(file.name)
+                  backgroundColor: selectedItems.has(file.file_id)
                     ? "#e0f7fa" // Keep selection color on hover if selected
                     : "#f5f5f5", // Slightly greyer on hover if not selected
                 },
@@ -129,7 +135,7 @@ const DirectoryTable = ({
               {/* created at */}
               <CustomTableCell>
                 <CalendarMonthIcon />
-                {file.created_at.toLocaleDateString()}
+                {file.created_at}
               </CustomTableCell>
               {/* file size */}
               <CustomTableCell>

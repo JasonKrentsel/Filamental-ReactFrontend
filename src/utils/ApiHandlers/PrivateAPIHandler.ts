@@ -1,8 +1,10 @@
 import axiosInstance from "./AxiosInstance";
+import axios from "axios";
 
 export const getPrivateData = async (
   endpoint: string,
   accessToken: string,
+  logout: () => void,
   maxRetries: number = 3,
   retryDelay: number = 500
 ) => {
@@ -18,6 +20,10 @@ export const getPrivateData = async (
 
       return response;
     } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        logout();
+        throw new Error("Unauthorized access. Logged out.");
+      }
       if (retries < maxRetries - 1) {
         retries++;
         await new Promise((resolve) => setTimeout(resolve, retryDelay));
@@ -32,6 +38,7 @@ export const postPrivateData = async (
   data: Record<string, unknown>,
   endpoint: string,
   accessToken: string,
+  logout: () => void,
   maxRetries: number = 3,
   retryDelay: number = 500
 ) => {
@@ -46,6 +53,10 @@ export const postPrivateData = async (
       });
       return response;
     } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        logout();
+        throw new Error("Unauthorized access. Logged out.");
+      }
       if (retries < maxRetries - 1) {
         retries++;
         await new Promise((resolve) => setTimeout(resolve, retryDelay));

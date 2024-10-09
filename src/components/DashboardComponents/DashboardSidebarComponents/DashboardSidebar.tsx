@@ -8,7 +8,7 @@ import {
 } from "../../../utils/ApiHandlers/OrganizationInfoHandler";
 import SelectableContainer from "./SelectableContainer";
 import { useTheme } from "@mui/material/styles";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import NewOrgDialog from "./Dialogs/NewOrgDialog";
 import AuthContext from "../../../context/AuthContext";
 import {
@@ -26,25 +26,30 @@ const DashboardSidebar = ({
   setSelectedOrg,
 }: DashboardSidebarProps) => {
   const theme = useTheme();
-  const { accessToken } = useContext(AuthContext);
+  const { accessToken, logout } = useContext(AuthContext);
   const [isNewOrgDialogOpen, setIsNewOrgDialogOpen] = useState(false);
   const [userOrgs, setUserOrgs] = useState<OrgDescription[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const refreshOrgList = (accessToken: string) => {
-    setIsLoading(true);
-    getUserOrgDescriptions(accessToken).then((orgs: OrgDescription[]) => {
-      setUserOrgs(orgs);
-      setIsLoading(false);
-    });
-  };
+  const refreshOrgList = useCallback(
+    (accessToken: string) => {
+      setIsLoading(true);
+      getUserOrgDescriptions(accessToken, logout).then(
+        (orgs: OrgDescription[]) => {
+          setUserOrgs(orgs);
+          setIsLoading(false);
+        }
+      );
+    },
+    [logout]
+  );
 
   useEffect(() => {
     refreshOrgList(accessToken);
-  }, [accessToken]);
+  }, [accessToken, logout, refreshOrgList]);
 
   const handleNewOrgCreation = async (newOrg: NewOrganizationDescription) => {
-    createOrganization(newOrg, accessToken).then(() => {
+    createOrganization(newOrg, accessToken, logout).then(() => {
       refreshOrgList(accessToken);
     });
   };

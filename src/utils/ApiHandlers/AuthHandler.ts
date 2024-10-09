@@ -33,9 +33,10 @@ export const refreshTokens = async (
   const response = await axiosInstance.post("/auth/token/refresh/", data);
 
   if (response.status === 200) {
-    console.log("Tokens refreshed");
+    console.log("tokens successfully refreshed");
     return response.data as AuthResponse;
   } else {
+    console.log("failed to refresh tokens", response.status);
     throw new Error("Failed to refresh token");
   }
 };

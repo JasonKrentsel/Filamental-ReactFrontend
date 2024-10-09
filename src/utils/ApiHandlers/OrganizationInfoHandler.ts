@@ -12,23 +12,27 @@ export type NewOrganizationDescription = {
 };
 
 export const getUserOrgDescriptions = async (
-  accessToken: string
+  accessToken: string,
+  logout: () => void
 ): Promise<OrgDescription[]> => {
   const response = await getPrivateData(
     "api/user/org-descriptions/",
-    accessToken
+    accessToken,
+    logout
   );
-  return (response.data as OrgDescription[]) || [];
+  return (response?.data as OrgDescription[]) || [];
 };
 
 export const createOrganization = async (
   newOrg: NewOrganizationDescription,
-  accessToken: string
+  accessToken: string,
+  logout: () => void
 ): Promise<OrgDescription> => {
   const response = await postPrivateData(
     newOrg,
     "api/user/create-org/",
-    accessToken
+    accessToken,
+    logout
   );
-  return response.data as OrgDescription;
+  return response?.data as OrgDescription;
 };

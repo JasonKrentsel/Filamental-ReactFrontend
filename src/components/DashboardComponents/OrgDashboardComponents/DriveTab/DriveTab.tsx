@@ -12,7 +12,6 @@ import {
   getDirectoryContentsByID,
   handleNewDirectory,
   handleUploadFiles,
-  SubDirectoryDescription,
 } from "../../../../utils/ApiHandlers/DriveActionHandler";
 
 interface DriveTabProps {
@@ -23,12 +22,15 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
   const [currentDirectory, setCurrentDirectory] =
     useState<DirectoryContents | null>(null);
 
-  const [directoryStack, setDirectoryStack] = useState<DirectoryContents[]>([
+  const [directoryStack, setDirectoryStack] = useState<
+    {
+      directory_id: string;
+      name: string;
+    }[]
+  >([
     {
       directory_id: currentOrg.org_root_directory_id,
       name: "Loading...",
-      files: [],
-      sub_directories: [],
     },
   ]);
 
@@ -38,34 +40,42 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
   const [openUploadFileDialog, setOpenUploadFileDialog] = useState(false);
   const [openNewFolderDialog, setOpenNewFolderDialog] = useState(false);
 
-  const { accessToken } = useContext(AuthContext);
+  const { accessToken, logout } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(true);
 
-  const handleSelect = (name: string, event: React.MouseEvent) => {
+  const handleSelect = (id: string, event: React.MouseEvent) => {
     setSelectedItems((prevSelected) => {
       const newSelected = new Set(prevSelected);
       if (event.ctrlKey || event.shiftKey) {
         // Ctrl-click: add/remove item from selection
-        if (newSelected.has(name)) {
-          newSelected.delete(name);
+        if (newSelected.has(id)) {
+          newSelected.delete(id);
         } else {
-          newSelected.add(name);
+          newSelected.add(id);
         }
       } else {
         // Regular click: clear selection and select only the clicked item
         newSelected.clear();
-        newSelected.add(name);
+        newSelected.add(id);
       }
       return newSelected;
     });
   };
 
-  const handleEnterDir = (subdirectory: SubDirectoryDescription) => {
+  const setCurrentDirectoryByID = (directory_id: string) => {
+    getDirectoryContentsByID(accessToken, directory_id, logout).then(
+      (newDirectory: DirectoryContents) => {
+        setCurrentDirectory(newDirectory);
+      }
+    );
+  };
+
+  const handleEnterDir = (directory_id: string) => {
     setIsLoading(true);
-    getDirectoryContentsByID(accessToken, subdirectory.directory_id).then(
+    getDirectoryContentsByID(accessToken, directory_id, logout).then(
       (newDirectory: DirectoryContents) => {
         setDirectoryStack([...directoryStack, newDirectory]);
-        setCurrentDirectory(newDirectory);
+        setCurrentDirectoryByID(directory_id);
         setIsLoading(false);
       }
     );
@@ -75,7 +85,8 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
     setIsLoading(true);
     getDirectoryContentsByID(
       accessToken,
-      currentOrg.org_root_directory_id
+      currentOrg.org_root_directory_id,
+      logout
     ).then((newDirectory: DirectoryContents) => {
       setCurrentDirectory(newDirectory);
       setDirectoryStack([newDirectory]);
@@ -95,7 +106,7 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
-  }, [accessToken, currentOrg.org_root_directory_id]);
+  }, [accessToken, currentOrg.org_root_directory_id, logout]);
 
   return (
     <Box
@@ -127,9 +138,10 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
                 padding: 1,
               }}
               onClick={() => {
-                // remove all directories after the current index
-                setDirectoryStack(directoryStack.slice(0, index + 1));
-                setCurrentDirectory(directoryStack[index]);
+                if (index !== directoryStack.length - 1) {
+                  setDirectoryStack(directoryStack.slice(0, index + 1));
+                  setCurrentDirectoryByID(directoryStack[index].directory_id);
+                }
               }}
             />
           ))}
@@ -156,13 +168,26 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
         <UploadFileDialog
           isOpen={openUploadFileDialog}
           setIsOpen={setOpenUploadFileDialog}
-          onSubmit={(files: FileList) => {
+          onSubmit={(filesList: FileList) => {
+            // this only uploads the first file in the list
+            // TODO: Upload all files in the list
             return currentDirectory
               ? handleUploadFiles(
                   accessToken,
                   currentDirectory.directory_id,
-                  files
-                )
+                  Array.from(filesList)[0],
+                  logout
+                ).then(() => {
+                  setIsLoading(true);
+                  getDirectoryContentsByID(
+                    accessToken,
+                    currentDirectory.directory_id,
+                    logout
+                  ).then((newDirectory: DirectoryContents) => {
+                    setCurrentDirectory(newDirectory);
+                    setIsLoading(false);
+                  });
+                })
               : Promise.reject(new Error("No current directory"));
           }}
         />
@@ -174,8 +199,19 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
               ? handleNewDirectory(
                   accessToken,
                   currentDirectory.directory_id,
-                  newFolderName
-                )
+                  newFolderName,
+                  logout
+                ).then(() => {
+                  setIsLoading(true);
+                  getDirectoryContentsByID(
+                    accessToken,
+                    currentDirectory.directory_id,
+                    logout
+                  ).then((newDirectory: DirectoryContents) => {
+                    setCurrentDirectory(newDirectory);
+                    setIsLoading(false);
+                  });
+                })
               : Promise.reject(new Error("No current directory"));
           }}
         />
