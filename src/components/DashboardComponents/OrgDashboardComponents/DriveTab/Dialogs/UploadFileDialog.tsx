@@ -1,75 +1,123 @@
-import { LoadingButton } from "@mui/lab";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
 } from "@mui/material";
+import UploadFileRow from "./UploadFileRow";
 import { useState } from "react";
-
 interface UploadFileDialogProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  onSubmit: (files: FileList) => Promise<void>;
+  currentDirectoryID: string;
+  onSubmit?: () => void;
 }
 
 const UploadFileDialog: React.FC<UploadFileDialogProps> = ({
   isOpen,
   setIsOpen,
-  onSubmit,
+  currentDirectoryID,
+  onSubmit = () => {},
 }) => {
-  const [fileList, setFileList] = useState<FileList | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [fileList, setFileList] = useState<File[]>([]);
+  const [triggerUpload, setTriggerUpload] = useState<boolean>(false);
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setFileList([]);
+    setTriggerUpload(false);
+  };
 
   return (
     <Dialog
       open={isOpen}
-      onClose={() => setIsOpen(false)}
-      PaperProps={{
-        component: "form",
-        onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
-          e.preventDefault();
-          if (!fileList) {
-            return;
-          }
-          setIsLoading(true);
-          onSubmit(fileList)
-            .then(() => {
-              setFileList(null);
-              setIsLoading(false);
-              setIsOpen(false);
-            })
-            .catch((error) => {
-              console.error(error);
-              setIsLoading(false);
-            });
+      onClose={handleClose}
+      sx={{
+        "& .MuiDialog-paper": {
+          width: "50%",
+          maxWidth: "none",
+          maxHeight: "75%",
         },
       }}
     >
       <DialogTitle>Upload Files</DialogTitle>
-      <DialogContent>
-        <input
-          type="file"
-          multiple
-          onChange={(e) => {
-            if (e.target.files && e.target.files.length > 0) {
-              setFileList(e.target.files);
-            }
-          }}
-          required
-        />
+      <DialogContent
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          overflow: "hidden",
+        }}
+      >
+        <Button variant="contained" component="label" sx={{ marginBottom: 2 }}>
+          Select Files
+          <input
+            type="file"
+            hidden
+            onChange={(e) => setFileList(Array.from(e.target.files || []))}
+            multiple
+          />
+        </Button>
+
+        <Table
+          stickyHeader
+          sx={{ userSelect: "none", width: "100%", overflow: "scroll" }}
+        >
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Size</TableCell>
+              <TableCell>Type</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {fileList &&
+              Array.from(fileList).map((fileEntry) => (
+                <UploadFileRow
+                  key={fileEntry.name}
+                  file={fileEntry}
+                  currentDirectoryID={currentDirectoryID}
+                  triggerUpload={triggerUpload}
+                  onDelete={() => {
+                    const newFileList = fileList.filter(
+                      (f) => f.name !== fileEntry.name
+                    );
+                    setFileList(newFileList);
+                  }}
+                />
+              ))}
+          </TableBody>
+        </Table>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => setIsOpen(false)}>Cancel</Button>
-        <LoadingButton
-          variant="contained"
-          loading={isLoading}
-          type="submit"
-          disabled={!fileList}
-        >
-          Upload
-        </LoadingButton>
+        <Button onClick={handleClose}>Cancel</Button>
+
+        {triggerUpload ? (
+          <Button
+            onClick={() => {
+              handleClose();
+              onSubmit();
+            }}
+          >
+            Finish
+          </Button>
+        ) : (
+          <Button
+            onClick={() => {
+              setTriggerUpload(true);
+            }}
+          >
+            Upload
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );

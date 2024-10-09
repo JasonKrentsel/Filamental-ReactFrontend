@@ -11,7 +11,6 @@ import {
   DirectoryContents,
   getDirectoryContentsByID,
   handleNewDirectory,
-  handleUploadFiles,
 } from "../../../../utils/ApiHandlers/DriveActionHandler";
 
 interface DriveTabProps {
@@ -19,20 +18,19 @@ interface DriveTabProps {
 }
 
 const DriveTab = ({ currentOrg }: DriveTabProps) => {
-  const [currentDirectory, setCurrentDirectory] =
-    useState<DirectoryContents | null>(null);
+  const [currentDirectory, setCurrentDirectory] = useState<DirectoryContents>({
+    directory_id: currentOrg.org_root_directory_id,
+    name: "Loading...",
+    files: [],
+    sub_directories: [],
+  });
 
   const [directoryStack, setDirectoryStack] = useState<
     {
       directory_id: string;
       name: string;
     }[]
-  >([
-    {
-      directory_id: currentOrg.org_root_directory_id,
-      name: "Loading...",
-    },
-  ]);
+  >([currentDirectory]);
 
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const tableRef = useRef<HTMLDivElement>(null);
@@ -165,32 +163,24 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
         />
 
         {/* Dialogs */}
+
         <UploadFileDialog
           isOpen={openUploadFileDialog}
           setIsOpen={setOpenUploadFileDialog}
-          onSubmit={(filesList: FileList) => {
-            // this only uploads the first file in the list
-            // TODO: Upload all files in the list
-            return currentDirectory
-              ? handleUploadFiles(
-                  accessToken,
-                  currentDirectory.directory_id,
-                  Array.from(filesList)[0],
-                  logout
-                ).then(() => {
-                  setIsLoading(true);
-                  getDirectoryContentsByID(
-                    accessToken,
-                    currentDirectory.directory_id,
-                    logout
-                  ).then((newDirectory: DirectoryContents) => {
-                    setCurrentDirectory(newDirectory);
-                    setIsLoading(false);
-                  });
-                })
-              : Promise.reject(new Error("No current directory"));
+          currentDirectoryID={currentDirectory?.directory_id}
+          onSubmit={() => {
+            setIsLoading(true);
+            return getDirectoryContentsByID(
+              accessToken,
+              currentDirectory.directory_id,
+              logout
+            ).then((newDirectory: DirectoryContents) => {
+              setCurrentDirectory(newDirectory);
+              setIsLoading(false);
+            });
           }}
         />
+
         <NewFolderDialog
           isOpen={openNewFolderDialog}
           setIsOpen={setOpenNewFolderDialog}
