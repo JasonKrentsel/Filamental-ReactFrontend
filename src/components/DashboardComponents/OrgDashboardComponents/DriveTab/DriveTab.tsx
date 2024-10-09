@@ -19,7 +19,7 @@ interface DriveTabProps {
 
 const DriveTab = ({ currentOrg }: DriveTabProps) => {
   const [currentDirectory, setCurrentDirectory] = useState<DirectoryContents>({
-    directory_id: currentOrg.org_root_directory_id,
+    id: currentOrg.org_root_directory_id,
     name: "Loading...",
     files: [],
     sub_directories: [],
@@ -27,12 +27,10 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
 
   const [directoryStack, setDirectoryStack] = useState<
     {
-      directory_id: string;
+      id: string;
       name: string;
     }[]
   >([currentDirectory]);
-
-  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const tableRef = useRef<HTMLDivElement>(null);
 
   const [openUploadFileDialog, setOpenUploadFileDialog] = useState(false);
@@ -41,23 +39,56 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
   const { accessToken, logout } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(true);
 
-  const handleSelect = (id: string, event: React.MouseEvent) => {
-    setSelectedItems((prevSelected) => {
-      const newSelected = new Set(prevSelected);
-      if (event.ctrlKey || event.shiftKey) {
-        // Ctrl-click: add/remove item from selection
-        if (newSelected.has(id)) {
-          newSelected.delete(id);
+  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
+  const [selectedDirectories, setSelectedDirectories] = useState<Set<string>>(
+    new Set()
+  );
+
+  const handleSelect = (
+    type: "file" | "directory",
+    id: string,
+    event: React.MouseEvent,
+    rightClick: boolean = false
+  ) => {
+    if (type === "file") {
+      setSelectedFiles((prevSelected) => {
+        const newSelected = new Set(prevSelected);
+        if (event.ctrlKey || event.shiftKey) {
+          // Ctrl-click: add/remove item from selection
+          if (newSelected.has(id)) {
+            newSelected.delete(id);
+          } else {
+            newSelected.add(id);
+          }
         } else {
+          // Regular click: clear selection and select only the clicked item
+          if (!rightClick || !newSelected.has(id)) {
+            setSelectedDirectories(new Set());
+            newSelected.clear();
+          }
           newSelected.add(id);
         }
-      } else {
-        // Regular click: clear selection and select only the clicked item
-        newSelected.clear();
-        newSelected.add(id);
-      }
-      return newSelected;
-    });
+        return newSelected;
+      });
+    } else if (type === "directory") {
+      setSelectedDirectories((prevSelected) => {
+        const newSelected = new Set(prevSelected);
+        if (event.ctrlKey || event.shiftKey) {
+          if (newSelected.has(id)) {
+            newSelected.delete(id);
+          } else {
+            newSelected.add(id);
+          }
+        } else {
+          if (!rightClick || !newSelected.has(id)) {
+            setSelectedFiles(new Set());
+            newSelected.clear();
+          }
+          newSelected.add(id);
+        }
+        return newSelected;
+      });
+    }
   };
 
   const setCurrentDirectoryByID = (directory_id: string) => {
@@ -96,7 +127,9 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
         tableRef.current &&
         !tableRef.current.contains(event.target as Node)
       ) {
-        setSelectedItems(new Set());
+        // Deselect everything when clicking outside the DirectoryTable
+        setSelectedFiles(new Set());
+        setSelectedDirectories(new Set());
       }
     };
 
@@ -138,7 +171,7 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
               onClick={() => {
                 if (index !== directoryStack.length - 1) {
                   setDirectoryStack(directoryStack.slice(0, index + 1));
-                  setCurrentDirectoryByID(directoryStack[index].directory_id);
+                  setCurrentDirectoryByID(directoryStack[index].id);
                 }
               }}
             />
@@ -146,12 +179,13 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
         </Breadcrumbs>
 
         {/* Directory Table */}
-        <Box sx={{ flexGrow: 1, overflow: "auto" }}>
+        <Box sx={{ flexGrow: 1, overflow: "auto" }} ref={tableRef}>
           <DirectoryTable
             currentDirectoryContents={currentDirectory}
             handleSelect={handleSelect}
             handleEnterDir={handleEnterDir}
-            selectedItems={selectedItems}
+            selectedFiles={selectedFiles}
+            selectedDirectories={selectedDirectories}
           />
         </Box>
 
@@ -167,12 +201,12 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
         <UploadFileDialog
           isOpen={openUploadFileDialog}
           setIsOpen={setOpenUploadFileDialog}
-          currentDirectoryID={currentDirectory?.directory_id}
+          currentDirectoryID={currentDirectory?.id}
           onSubmit={() => {
             setIsLoading(true);
             return getDirectoryContentsByID(
               accessToken,
-              currentDirectory.directory_id,
+              currentDirectory.id,
               logout
             ).then((newDirectory: DirectoryContents) => {
               setCurrentDirectory(newDirectory);
@@ -188,14 +222,14 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
             return currentDirectory
               ? handleNewDirectory(
                   accessToken,
-                  currentDirectory.directory_id,
+                  currentDirectory.id,
                   newFolderName,
                   logout
                 ).then(() => {
                   setIsLoading(true);
                   getDirectoryContentsByID(
                     accessToken,
-                    currentDirectory.directory_id,
+                    currentDirectory.id,
                     logout
                   ).then((newDirectory: DirectoryContents) => {
                     setCurrentDirectory(newDirectory);

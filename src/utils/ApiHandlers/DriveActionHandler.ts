@@ -1,7 +1,7 @@
 import { getPrivateData, postPrivateData } from "./PrivateAPIHandler";
 
 export type FileDescription = {
-  file_id: string;
+  id: string;
   name: string;
   created_at: string;
   created_by: string;
@@ -9,14 +9,14 @@ export type FileDescription = {
 };
 
 export type DirectoryDescription = {
-  directory_id: string;
+  id: string;
   name: string;
   created_at: string;
   created_by: string;
 };
 
 export type DirectoryContents = {
-  directory_id: string;
+  id: string;
   name: string;
   files: FileDescription[];
   sub_directories: DirectoryDescription[];
