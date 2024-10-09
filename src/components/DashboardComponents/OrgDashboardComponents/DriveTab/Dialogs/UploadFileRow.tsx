@@ -80,8 +80,19 @@ const UploadFileRow = ({
         ) : status === "success" ? (
           <CheckIcon fontSize="large" color="success" />
         ) : status === "failed" ? (
-          <Tooltip title={error} placement="top">
-            <ErrorIcon fontSize="large" color="error" />
+          <Tooltip
+            title={
+              <Box display="flex" flexDirection="column" alignItems="center">
+                <Typography align="center">Error</Typography>
+                <Typography align="center">{error}</Typography>
+                <Typography align="center">Click to retry</Typography>
+              </Box>
+            }
+            placement="top"
+          >
+            <IconButton onClick={() => handleUpload(file)}>
+              <ErrorIcon fontSize="large" color="error" />
+            </IconButton>
           </Tooltip>
         ) : null}
       </TableCell>
