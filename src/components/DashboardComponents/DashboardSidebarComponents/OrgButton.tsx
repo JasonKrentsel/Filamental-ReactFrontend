@@ -1,5 +1,5 @@
 import { Fab, Typography, FabProps, Tooltip } from "@mui/material";
-import { OrgDescription } from "../../../utils/datatypes/Organization";
+import { OrgDescription } from "../../../utils/ApiHandlers/OrganizationInfoHandler";
 
 interface OrgButtonProps {
   orgDescription: OrgDescription;

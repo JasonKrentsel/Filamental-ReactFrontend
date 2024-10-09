@@ -35,13 +35,13 @@ const UploadFileRow = ({
     "staging" | "uploading" | "success" | "failed"
   >("staging");
 
-  const { accessToken, logout } = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
 
   const handleUpload = useCallback(
     async (file: File): Promise<void> => {
-      return handleUploadFiles(accessToken, currentDirectoryID, file, logout);
+      return handleUploadFiles(authContext, currentDirectoryID, file);
     },
-    [accessToken, currentDirectoryID, logout]
+    [authContext, currentDirectoryID]
   );
 
   useEffect(() => {

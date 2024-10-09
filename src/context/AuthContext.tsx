@@ -2,11 +2,14 @@ import React, {
   createContext,
   useCallback,
   useEffect,
-  useRef,
   useState,
   useMemo,
 } from "react";
-import { refreshTokens, getToken } from "../utils/ApiHandlers/AuthHandler.ts";
+import {
+  refreshTokens,
+  getToken,
+  AuthContextType,
+} from "../utils/ApiHandlers/AuthHandler";
 
 // ------------------- Interfaces -------------------
 // UPDATE INTERFACE WHEN UPDATING BACKEND AUTH TOKEN RESPONSE
@@ -25,20 +28,13 @@ export interface DecodedAuthToken {
 
 // ------------------- Context -------------------
 
-interface AuthContextType {
-  isLoggedIn: boolean;
-  accessToken: string;
-  refreshToken: string;
-  login: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
-  logout: () => void;
-}
-
 const AuthContext = createContext<AuthContextType>({
   isLoggedIn: false,
-  accessToken: "",
-  refreshToken: "",
+  getAccessToken: () => "",
+  getRefreshToken: () => "",
   login: async () => {},
   logout: () => {},
+  attemptTokenRefresh: async () => {},
 });
 
 export default AuthContext;
@@ -48,17 +44,18 @@ export default AuthContext;
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const accessTokenRef = useRef<string>(
-    localStorage.getItem("accessToken") || ""
+  const getAccessToken = useCallback(
+    () => localStorage.getItem("accessToken") || "",
+    []
   );
-  const refreshTokenRef = useRef<string>(
-    localStorage.getItem("refreshToken") || ""
+  const getRefreshToken = useCallback(
+    () => localStorage.getItem("refreshToken") || "",
+    []
   );
-  const [isLoggedIn, setIsLoggedIn] = useState(accessTokenRef.current !== "");
+
+  const [isLoggedIn, setIsLoggedIn] = useState(getRefreshToken() !== "");
 
   const updateTokens = useCallback((access: string, refresh: string) => {
-    accessTokenRef.current = access;
-    refreshTokenRef.current = refresh;
     if (access !== "") {
       localStorage.setItem("accessToken", access);
       localStorage.setItem("refreshToken", refresh);
@@ -90,38 +87,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     updateTokens("", "");
   }, [updateTokens]);
 
-  const updateAuthTokens = useCallback(async () => {
+  const attemptTokenRefresh = useCallback(async () => {
     try {
-      const { access, refresh } = await refreshTokens(refreshTokenRef.current);
+      const { access, refresh } = await refreshTokens(getRefreshToken());
       updateTokens(access, refresh);
     } catch {
       logout();
     }
-  }, [updateTokens, logout]);
+  }, [updateTokens, getRefreshToken, logout]);
 
   useEffect(() => {
     if (isLoggedIn) {
-      updateAuthTokens();
+      attemptTokenRefresh();
     }
-    // 3 minutes
-    const timeInterval = 1000 * 60 * 3;
+    // 4 minutes
+    const timeInterval = 1000 * 60 * 4;
     const intervalId = setInterval(() => {
       if (isLoggedIn) {
-        updateAuthTokens();
+        attemptTokenRefresh();
       }
     }, timeInterval);
     return () => clearInterval(intervalId);
-  }, [updateAuthTokens, isLoggedIn]);
+  }, [attemptTokenRefresh, isLoggedIn]);
 
   const contextValue = useMemo(
     () => ({
       isLoggedIn,
-      accessToken: accessTokenRef.current,
-      refreshToken: refreshTokenRef.current,
+      getAccessToken,
+      getRefreshToken,
       login,
       logout,
+      attemptTokenRefresh,
     }),
-    [isLoggedIn, login, logout]
+    [
+      isLoggedIn,
+      getAccessToken,
+      getRefreshToken,
+      login,
+      logout,
+      attemptTokenRefresh,
+    ]
   );
 
   return (

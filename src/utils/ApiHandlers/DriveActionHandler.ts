@@ -1,3 +1,4 @@
+import { AuthContextType } from "./AuthHandler";
 import { getPrivateData, postPrivateData } from "./PrivateAPIHandler";
 
 export type FileDescription = {
@@ -23,52 +24,42 @@ export type DirectoryContents = {
 };
 
 export const getDirectoryContentsByID = async (
-  access_token: string,
-  directory_id: string,
-  logout: () => void
+  authContext: AuthContextType,
+  directory_id: string
 ): Promise<DirectoryContents> => {
   const response = await getPrivateData(
-    `api/organization/get-directory-by-id/${directory_id}/`,
-    access_token,
-    logout
+    authContext,
+    `api/organization/get-directory-by-id/${directory_id}/`
   );
 
   return response?.data as DirectoryContents;
 };
 
 export const handleUploadFiles = async (
-  access_token: string,
+  authContext: AuthContextType,
   directory_id: string,
-  file: File,
-  logout: () => void
+  file: File
 ): Promise<void> => {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("parent_directory_id", directory_id);
 
   await postPrivateData(
-    formData as unknown as Record<string, unknown>,
+    authContext,
     "api/organization/new-file/",
-    access_token,
-    logout
+    formData as unknown as Record<string, unknown>
   );
 
   return;
 };
 
 export const handleNewDirectory = async (
-  access_token: string,
+  authContext: AuthContextType,
   parent_directory_id: string,
-  directory_name: string,
-  logout: () => void
+  directory_name: string
 ): Promise<void> => {
-  await postPrivateData(
-    {
-      new_directory_name: directory_name,
-      parent_directory_id: parent_directory_id,
-    },
-    "api/organization/new-directory/",
-    access_token,
-    logout
-  );
+  await postPrivateData(authContext, "api/organization/new-directory/", {
+    new_directory_name: directory_name,
+    parent_directory_id: parent_directory_id,
+  });
 };

@@ -36,7 +36,7 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
   const [openUploadFileDialog, setOpenUploadFileDialog] = useState(false);
   const [openNewFolderDialog, setOpenNewFolderDialog] = useState(false);
 
-  const { accessToken, logout } = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(true);
 
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
@@ -92,7 +92,7 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
   };
 
   const setCurrentDirectoryByID = (directory_id: string) => {
-    getDirectoryContentsByID(accessToken, directory_id, logout).then(
+    getDirectoryContentsByID(authContext, directory_id).then(
       (newDirectory: DirectoryContents) => {
         setCurrentDirectory(newDirectory);
       }
@@ -101,7 +101,7 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
 
   const handleEnterDir = (directory_id: string) => {
     setIsLoading(true);
-    getDirectoryContentsByID(accessToken, directory_id, logout).then(
+    getDirectoryContentsByID(authContext, directory_id).then(
       (newDirectory: DirectoryContents) => {
         setDirectoryStack([...directoryStack, newDirectory]);
         setCurrentDirectoryByID(directory_id);
@@ -113,9 +113,8 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
   useEffect(() => {
     setIsLoading(true);
     getDirectoryContentsByID(
-      accessToken,
-      currentOrg.org_root_directory_id,
-      logout
+      authContext,
+      currentOrg.org_root_directory_id
     ).then((newDirectory: DirectoryContents) => {
       setCurrentDirectory(newDirectory);
       setDirectoryStack([newDirectory]);
@@ -137,7 +136,7 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
-  }, [accessToken, currentOrg.org_root_directory_id, logout]);
+  }, [authContext, currentOrg.org_root_directory_id]);
 
   return (
     <Box
@@ -205,9 +204,8 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
           onSubmit={() => {
             setIsLoading(true);
             return getDirectoryContentsByID(
-              accessToken,
-              currentDirectory.id,
-              logout
+              authContext,
+              currentDirectory.id
             ).then((newDirectory: DirectoryContents) => {
               setCurrentDirectory(newDirectory);
               setIsLoading(false);
@@ -221,16 +219,14 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
           onSubmit={(newFolderName: string) => {
             return currentDirectory
               ? handleNewDirectory(
-                  accessToken,
+                  authContext,
                   currentDirectory.id,
-                  newFolderName,
-                  logout
+                  newFolderName
                 ).then(() => {
                   setIsLoading(true);
                   getDirectoryContentsByID(
-                    accessToken,
-                    currentDirectory.id,
-                    logout
+                    authContext,
+                    currentDirectory.id
                   ).then((newDirectory: DirectoryContents) => {
                     setCurrentDirectory(newDirectory);
                     setIsLoading(false);

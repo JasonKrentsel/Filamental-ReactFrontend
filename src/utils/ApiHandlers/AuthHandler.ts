@@ -1,5 +1,14 @@
 import axiosInstance from "./AxiosInstance";
 
+export type AuthContextType = {
+  isLoggedIn: boolean;
+  getAccessToken: () => string;
+  getRefreshToken: () => string;
+  login: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
+  logout: () => void;
+  attemptTokenRefresh: () => Promise<void>;
+};
+
 export interface AuthResponse {
   access: string;
   refresh: string;
@@ -33,7 +42,7 @@ export const refreshTokens = async (
   const response = await axiosInstance.post("/auth/token/refresh/", data);
 
   if (response.status === 200) {
-    console.log("tokens successfully refreshed");
+    console.log("tokens successfully refreshed", response.data as AuthResponse);
     return response.data as AuthResponse;
   } else {
     console.log("failed to refresh tokens", response.status);

@@ -1,4 +1,5 @@
 import { getPrivateData, postPrivateData } from "./PrivateAPIHandler";
+import { AuthContextType } from "./AuthHandler";
 
 export type OrgDescription = {
   org_name: string;
@@ -12,27 +13,23 @@ export type NewOrganizationDescription = {
 };
 
 export const getUserOrgDescriptions = async (
-  accessToken: string,
-  logout: () => void
+  authContext: AuthContextType
 ): Promise<OrgDescription[]> => {
   const response = await getPrivateData(
-    "api/user/org-descriptions/",
-    accessToken,
-    logout
+    authContext,
+    "api/user/org-descriptions/"
   );
   return (response?.data as OrgDescription[]) || [];
 };
 
 export const createOrganization = async (
-  newOrg: NewOrganizationDescription,
-  accessToken: string,
-  logout: () => void
+  authContext: AuthContextType,
+  newOrg: NewOrganizationDescription
 ): Promise<OrgDescription> => {
   const response = await postPrivateData(
-    newOrg,
+    authContext,
     "api/user/create-org/",
-    accessToken,
-    logout
+    newOrg
   );
   return response?.data as OrgDescription;
 };

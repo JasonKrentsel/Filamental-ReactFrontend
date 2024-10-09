@@ -1,10 +1,10 @@
+import { AuthContextType } from "./AuthHandler";
 import axiosInstance from "./AxiosInstance";
 import axios from "axios";
 
 export const getPrivateData = async (
+  authContext: AuthContextType,
   endpoint: string,
-  accessToken: string,
-  logout: () => void,
   maxRetries: number = 3,
   retryDelay: number = 500
 ) => {
@@ -14,14 +14,14 @@ export const getPrivateData = async (
     try {
       const response = await axiosInstance.get(endpoint, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${authContext.getAccessToken()}`,
         },
       });
 
       return response;
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        logout();
+        authContext.logout();
         throw new Error("Unauthorized access. Logged out.");
       }
       if (retries < maxRetries - 1) {
@@ -35,21 +35,20 @@ export const getPrivateData = async (
 };
 
 export const postPrivateData = async (
-  data: Record<string, unknown>,
+  authContext: AuthContextType,
   endpoint: string,
-  accessToken: string,
-  logout: () => void
+  data: Record<string, unknown>
 ) => {
   try {
     const response = await axiosInstance.post(endpoint, data, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${authContext.getAccessToken()}`,
       },
     });
     return response;
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response?.status === 401) {
-      logout();
+      authContext.logout();
       throw new Error("Unauthorized access. Logged out.");
     }
     throw error;

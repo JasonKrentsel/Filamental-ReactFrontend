@@ -26,31 +26,26 @@ const DashboardSidebar = ({
   setSelectedOrg,
 }: DashboardSidebarProps) => {
   const theme = useTheme();
-  const { accessToken, logout } = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
   const [isNewOrgDialogOpen, setIsNewOrgDialogOpen] = useState(false);
   const [userOrgs, setUserOrgs] = useState<OrgDescription[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const refreshOrgList = useCallback(
-    (accessToken: string) => {
-      setIsLoading(true);
-      getUserOrgDescriptions(accessToken, logout).then(
-        (orgs: OrgDescription[]) => {
-          setUserOrgs(orgs);
-          setIsLoading(false);
-        }
-      );
-    },
-    [logout]
-  );
+  const refreshOrgList = useCallback(() => {
+    setIsLoading(true);
+    getUserOrgDescriptions(authContext).then((orgs: OrgDescription[]) => {
+      setUserOrgs(orgs);
+      setIsLoading(false);
+    });
+  }, [authContext]);
 
   useEffect(() => {
-    refreshOrgList(accessToken);
-  }, [accessToken, logout, refreshOrgList]);
+    refreshOrgList();
+  }, [authContext, refreshOrgList]);
 
   const handleNewOrgCreation = async (newOrg: NewOrganizationDescription) => {
-    createOrganization(newOrg, accessToken, logout).then(() => {
-      refreshOrgList(accessToken);
+    createOrganization(authContext, newOrg).then(() => {
+      refreshOrgList();
     });
   };
 
