@@ -7,6 +7,7 @@ import {
   DialogActions,
   Button,
   Box,
+  Alert,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 
@@ -23,8 +24,8 @@ const NewFolderDialog: React.FC<NewFolderDialogProps> = ({
 }) => {
   const [folderName, setFolderName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // TODO: add validation for folder name
   return (
     <Dialog
       open={isOpen}
@@ -41,7 +42,7 @@ const NewFolderDialog: React.FC<NewFolderDialogProps> = ({
               setIsOpen(false);
             })
             .catch((error) => {
-              console.error(error);
+              setError(error.response.data["error"]);
               setIsLoading(false);
             });
         },
@@ -69,6 +70,7 @@ const NewFolderDialog: React.FC<NewFolderDialogProps> = ({
           Create
         </LoadingButton>
       </DialogActions>
+      {error && <Alert severity="error">{error}</Alert>}
     </Dialog>
   );
 };
