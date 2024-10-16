@@ -2,6 +2,7 @@ import { useState } from "react";
 import { OrgDescription } from "../../../utils/ApiHandlers/OrganizationInfoHandler";
 import { Tabs, Tab, Box } from "@mui/material";
 import DriveTab from "./DriveTab/DriveTab";
+import ChatTab from "./ChatTab/ChatTab";
 
 interface OrgDashboardProps {
   currentOrg: OrgDescription;
@@ -26,7 +27,7 @@ const OrgDashboard = ({ currentOrg }: OrgDashboardProps) => {
           <DriveTab currentOrg={currentOrg} />
         </Box>
         <Box sx={{ display: selectedTab === 1 ? "block" : "none" }}>
-          {/* Chat tab content */}
+          <ChatTab currentOrg={currentOrg} />
         </Box>
         <Box sx={{ display: selectedTab === 2 ? "block" : "none" }}>
           {/* Organization tab content */}

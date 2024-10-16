@@ -7,6 +7,7 @@ export type FileDescription = {
   created_at: string;
   created_by: string;
   file_size: number;
+  embedded: boolean;
 };
 
 export type DirectoryDescription = {

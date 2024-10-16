@@ -244,7 +244,7 @@ function renderSubdirectories(
         }}
       >
         <CustomTableCell>
-          <FolderIcon />
+          <FolderIcon sx={{ color: "#ffd96f" }} />
           {subdirectory.name}
         </CustomTableCell>
         <CustomTableCell>
@@ -294,7 +294,9 @@ function renderFiles(
       }}
     >
       <CustomTableCell>
-        <InsertDriveFileIcon />
+        <InsertDriveFileIcon
+          sx={{ color: file.embedded ? "#00FF00" : "inherit" }}
+        />
         {file.name}
       </CustomTableCell>
       <CustomTableCell>
