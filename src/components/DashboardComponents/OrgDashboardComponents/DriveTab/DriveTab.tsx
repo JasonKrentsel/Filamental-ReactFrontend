@@ -139,104 +139,93 @@ const DriveTab = ({ currentOrg }: DriveTabProps) => {
   }, [authContext, currentOrg.org_root_directory_id]);
 
   return (
-    <Box
-      sx={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-      }}
-    >
-      <Stack
-        spacing={1}
+    <Stack height="100%" maxHeight="100%">
+      {/* Breadcrumb */}
+      <Breadcrumbs
+        separator={<NavigateNextIcon fontSize="small" />}
         sx={{
-          height: "100%",
-          overflow: "hidden",
+          paddingLeft: 1,
         }}
       >
-        {/* Breadcrumb */}
-        <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-          {directoryStack.map((dir, index) => (
-            <Chip
-              key={index}
-              label={
-                <Typography variant="h6" color="text.secondary">
-                  {dir.name}
-                </Typography>
+        {directoryStack.map((dir, index) => (
+          <Chip
+            key={index}
+            label={
+              <Typography variant="h6" color="text.secondary">
+                {dir.name}
+              </Typography>
+            }
+            sx={{
+              padding: 1,
+            }}
+            onClick={() => {
+              if (index !== directoryStack.length - 1) {
+                setDirectoryStack(directoryStack.slice(0, index + 1));
+                setCurrentDirectoryByID(directoryStack[index].id);
               }
-              sx={{
-                padding: 1,
-              }}
-              onClick={() => {
-                if (index !== directoryStack.length - 1) {
-                  setDirectoryStack(directoryStack.slice(0, index + 1));
-                  setCurrentDirectoryByID(directoryStack[index].id);
-                }
-              }}
-            />
-          ))}
-        </Breadcrumbs>
-
-        {/* Directory Table */}
-        <Box sx={{ flexGrow: 1, overflow: "auto" }} ref={tableRef}>
-          <DirectoryTable
-            currentDirectoryContents={currentDirectory}
-            handleSelect={handleSelect}
-            handleEnterDir={handleEnterDir}
-            selectedFiles={selectedFiles}
-            selectedDirectories={selectedDirectories}
+            }}
           />
-        </Box>
+        ))}
+      </Breadcrumbs>
 
-        {/* AddActionFAB */}
-        <AddActionFAB
-          onUploadFileDialog={() => setOpenUploadFileDialog(true)}
-          onNewFolderDialog={() => setOpenNewFolderDialog(true)}
-          disabled={isLoading || !currentDirectory}
+      {/* Directory Table */}
+      <Box ref={tableRef}>
+        <DirectoryTable
+          currentDirectoryContents={currentDirectory}
+          handleSelect={handleSelect}
+          handleEnterDir={handleEnterDir}
+          selectedFiles={selectedFiles}
+          selectedDirectories={selectedDirectories}
         />
+      </Box>
 
-        {/* Dialogs */}
+      {/* AddActionFAB */}
+      <AddActionFAB
+        onUploadFileDialog={() => setOpenUploadFileDialog(true)}
+        onNewFolderDialog={() => setOpenNewFolderDialog(true)}
+        disabled={isLoading || !currentDirectory}
+      />
 
-        <UploadFileDialog
-          isOpen={openUploadFileDialog}
-          setIsOpen={setOpenUploadFileDialog}
-          currentDirectoryID={currentDirectory?.id}
-          onSubmit={() => {
-            setIsLoading(true);
-            return getDirectoryContentsByID(
-              authContext,
-              currentDirectory.id
-            ).then((newDirectory: DirectoryContents) => {
-              setCurrentDirectory(newDirectory);
-              setIsLoading(false);
-            });
-          }}
-        />
+      {/* Dialogs */}
 
-        <NewFolderDialog
-          isOpen={openNewFolderDialog}
-          setIsOpen={setOpenNewFolderDialog}
-          onSubmit={(newFolderName: string) => {
-            return currentDirectory
-              ? handleNewDirectory(
-                  authContext,
-                  currentDirectory.id,
-                  newFolderName
-                ).then(() => {
-                  setIsLoading(true);
-                  getDirectoryContentsByID(
-                    authContext,
-                    currentDirectory.id
-                  ).then((newDirectory: DirectoryContents) => {
+      <UploadFileDialog
+        isOpen={openUploadFileDialog}
+        setIsOpen={setOpenUploadFileDialog}
+        currentDirectoryID={currentDirectory?.id}
+        onSubmit={() => {
+          setIsLoading(true);
+          return getDirectoryContentsByID(
+            authContext,
+            currentDirectory.id
+          ).then((newDirectory: DirectoryContents) => {
+            setCurrentDirectory(newDirectory);
+            setIsLoading(false);
+          });
+        }}
+      />
+
+      <NewFolderDialog
+        isOpen={openNewFolderDialog}
+        setIsOpen={setOpenNewFolderDialog}
+        onSubmit={(newFolderName: string) => {
+          return currentDirectory
+            ? handleNewDirectory(
+                authContext,
+                currentDirectory.id,
+                newFolderName
+              ).then(() => {
+                setIsLoading(true);
+                getDirectoryContentsByID(authContext, currentDirectory.id).then(
+                  (newDirectory: DirectoryContents) => {
                     setCurrentDirectory(newDirectory);
                     setIsLoading(false);
-                  });
-                })
-              : Promise.reject(new Error("No current directory"));
-          }}
-        />
-      </Stack>
-    </Box>
+                  }
+                );
+              })
+            : Promise.reject(new Error("No current directory"));
+        }}
+      />
+    </Stack>
   );
 };
 

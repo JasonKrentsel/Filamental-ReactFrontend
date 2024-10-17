@@ -17,21 +17,44 @@ const OrgDashboard = ({ currentOrg }: OrgDashboardProps) => {
         value={selectedTab}
         onChange={(_, newValue) => setSelectedTab(newValue)}
         centered
+        sx={{
+          height: "5%",
+          maxHeight: "5%",
+        }}
       >
         <Tab label="Drive" />
         <Tab label="Chat" />
         <Tab label="Organization" />
       </Tabs>
-      <Box flexGrow={1} margin={1} borderRadius={2} overflow="hidden">
-        <Box sx={{ display: selectedTab === 0 ? "block" : "none" }}>
+      <Box height="95%" maxHeight="95%">
+        <div
+          style={{
+            display: selectedTab === 0 ? "flex" : "none",
+            height: "100%",
+            width: "100%",
+            flexDirection: "column",
+          }}
+        >
           <DriveTab currentOrg={currentOrg} />
-        </Box>
-        <Box sx={{ display: selectedTab === 1 ? "block" : "none" }}>
+        </div>
+        <div
+          style={{
+            display: selectedTab === 1 ? "flex" : "none",
+            height: "100%",
+            width: "100%",
+          }}
+        >
           <ChatTab currentOrg={currentOrg} />
-        </Box>
-        <Box sx={{ display: selectedTab === 2 ? "block" : "none" }}>
+        </div>
+        <div
+          style={{
+            display: selectedTab === 2 ? "flex" : "none",
+            height: "100%",
+            width: "100%",
+          }}
+        >
           {/* Organization tab content */}
-        </Box>
+        </div>
       </Box>
     </Box>
   );

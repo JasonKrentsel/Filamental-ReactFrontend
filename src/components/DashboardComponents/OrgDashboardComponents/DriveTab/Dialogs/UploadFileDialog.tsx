@@ -7,6 +7,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableRow,
 } from "@mui/material";
@@ -65,37 +66,39 @@ const UploadFileDialog: React.FC<UploadFileDialogProps> = ({
           />
         </Button>
 
-        <Table
-          stickyHeader
-          sx={{ userSelect: "none", width: "100%", overflow: "scroll" }}
-        >
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Size</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {fileList &&
-              Array.from(fileList).map((fileEntry) => (
-                <UploadFileRow
-                  key={fileEntry.name}
-                  file={fileEntry}
-                  currentDirectoryID={currentDirectoryID}
-                  triggerUpload={triggerUpload}
-                  onDelete={() => {
-                    const newFileList = fileList.filter(
-                      (f) => f.name !== fileEntry.name
-                    );
-                    setFileList(newFileList);
-                  }}
-                />
-              ))}
-          </TableBody>
-        </Table>
+        <TableContainer>
+          <Table
+            stickyHeader
+            sx={{ userSelect: "none", width: "100%", overflow: "scroll" }}
+          >
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Size</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {fileList &&
+                Array.from(fileList).map((fileEntry) => (
+                  <UploadFileRow
+                    key={fileEntry.name}
+                    file={fileEntry}
+                    currentDirectoryID={currentDirectoryID}
+                    triggerUpload={triggerUpload}
+                    onDelete={() => {
+                      const newFileList = fileList.filter(
+                        (f) => f.name !== fileEntry.name
+                      );
+                      setFileList(newFileList);
+                    }}
+                  />
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>

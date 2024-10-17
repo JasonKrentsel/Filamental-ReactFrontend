@@ -1,5 +1,4 @@
 import {
-  Divider,
   Table,
   TableBody,
   TableCell,
@@ -73,56 +72,54 @@ const DirectoryTable = ({
   );
 
   return (
-    <>
-      {contextMenu && (
-        <ContextMenu
-          x={contextMenu.x}
-          y={contextMenu.y}
-          selectedFilesIDs={selectedFiles}
-          selectedDirectoriesIDs={selectedDirectories}
-          handleCloseContextMenu={() => setContextMenu(null)}
-        />
-      )}
-      <TableContainer
-        sx={{
-          borderRadius: "16px",
-          overflow: "scroll",
-          "&::-webkit-scrollbar": { display: "none" },
-          "-ms-overflow-style": "none",
-          "scrollbar-width": "none",
-        }}
-        onPointerUp={handleMouseUp}
-      >
-        <Table stickyHeader sx={{ userSelect: "none" }}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Created By</TableCell>
-              <TableCell>Created At</TableCell>
-              <TableCell>File Size</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {renderSubdirectories(
-              currentDirectoryContents,
-              handlePointerDown,
-              handleEnterDir,
-              handleContextMenu,
-              handleMouseOver,
-              selectedDirectories
-            )}
-            {renderFiles(
-              currentDirectoryContents,
-              handlePointerDown,
-              handleContextMenu,
-              handleMouseOver,
-              selectedFiles
-            )}
-          </TableBody>
-        </Table>
-        <Divider sx={{ width: "100%", borderBottomWidth: 2 }} />
-      </TableContainer>
-    </>
+    <TableContainer
+      onPointerUp={handleMouseUp}
+      sx={{
+        maxHeight: "calc(100% - 135px)",
+        margin: 0,
+        padding: 0,
+        position: "fixed",
+      }}
+    >
+      <Table stickyHeader sx={{ userSelect: "none" }}>
+        <TableHead>
+          <TableRow>
+            <TableCell width="40%">Name</TableCell>
+            <TableCell width="20%">Created By</TableCell>
+            <TableCell width="20%">Created At</TableCell>
+            <TableCell width="20%">File Size</TableCell>
+          </TableRow>
+        </TableHead>
+
+        <TableBody>
+          {renderSubdirectories(
+            currentDirectoryContents,
+            handlePointerDown,
+            handleEnterDir,
+            handleContextMenu,
+            handleMouseOver,
+            selectedDirectories
+          )}
+          {renderFiles(
+            currentDirectoryContents,
+            handlePointerDown,
+            handleContextMenu,
+            handleMouseOver,
+            selectedFiles
+          )}
+
+          {contextMenu && (
+            <ContextMenu
+              x={contextMenu.x}
+              y={contextMenu.y}
+              selectedFilesIDs={selectedFiles}
+              selectedDirectoriesIDs={selectedDirectories}
+              handleCloseContextMenu={() => setContextMenu(null)}
+            />
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 

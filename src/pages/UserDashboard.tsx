@@ -9,7 +9,7 @@ const UserDashboard = () => {
   const [selectedOrg, setSelectedOrg] = useState<OrgDescription | null>(null);
 
   return (
-    <Stack direction="row" height="100%" sx={{ overflow: "hidden" }}>
+    <Stack direction="row" height="100%">
       <Box width={75} flexShrink={0}>
         <DashboardSidebar
           selectedOrg={selectedOrg}

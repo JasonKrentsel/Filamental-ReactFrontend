@@ -2,7 +2,10 @@ import { Box, Button, Input, Typography } from "@mui/material";
 import { OrgDescription } from "../../../../utils/ApiHandlers/OrganizationInfoHandler";
 import { useContext, useState } from "react";
 import AuthContext from "../../../../context/AuthContext";
-import { searchQuery } from "../../../../utils/ApiHandlers/QueryHandler";
+import {
+  QueryResult,
+  searchQuery,
+} from "../../../../utils/ApiHandlers/QueryHandler";
 
 interface ChatTabProps {
   currentOrg: OrgDescription;
@@ -10,7 +13,7 @@ interface ChatTabProps {
 
 const ChatTab = ({ currentOrg }: ChatTabProps) => {
   const authContext = useContext(AuthContext);
-  const [response, setResponse] = useState<string>("");
+  const [response, setResponse] = useState<QueryResult[]>([]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -19,9 +22,7 @@ const ChatTab = ({ currentOrg }: ChatTabProps) => {
     if (searchQueryText) {
       searchQuery(authContext, searchQueryText, currentOrg.org_id).then(
         (res) => {
-          console.log(res);
-          const formattedResponse = JSON.stringify(res, null, 2); // Format JSON with 2 spaces
-          setResponse(formattedResponse);
+          setResponse(res);
         }
       );
     }
@@ -29,17 +30,16 @@ const ChatTab = ({ currentOrg }: ChatTabProps) => {
 
   return (
     <Box
-      sx={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-      }}
+      height="100%"
+      maxHeight="100%"
+      width="100%"
+      maxWidth="100%"
+      padding={2}
     >
       <Typography variant="h6">
         {currentOrg.org_name} - {currentOrg.org_id} - Chat
       </Typography>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} style={{ width: "100%" }}>
         <Input
           placeholder="Search"
           name="search"
@@ -50,7 +50,12 @@ const ChatTab = ({ currentOrg }: ChatTabProps) => {
         ></Input>
         <Button type="submit">Search</Button>
       </form>
-      <Typography>{response}</Typography>
+      {response.map((result) => (
+        <Typography>
+          {result.file_name} - Page {result.file_page} - Similarity Score:{" "}
+          {result.similarity_score}
+        </Typography>
+      ))}
     </Box>
   );
 };
